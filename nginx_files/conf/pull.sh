@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Переходим в директорию с вашим репозиторием
-cd /home/blesk/nginx-http3/ 
+cd /myproject/ 
 
 # Получаем последние изменения из репозитория
 git fetch

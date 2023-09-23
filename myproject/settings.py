@@ -138,9 +138,9 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = reverse_lazy('MainApp:login')
+LOGIN_URL = '/accounts/login'
+LOGOUT_URL = '/accounts/logout/'
 LOGIN_REDIRECT_URL = reverse_lazy('MainApp:profile')
-LOGOUT_URL = '/accounts/ogout/'
 AUTH_USER_MODEL = 'auth.User'
 
 CSRF_COOKIE_NAME = 'csrftoken'

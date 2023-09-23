@@ -7,7 +7,6 @@ from django.views.decorators.csrf import csrf_protect
 def home_render(request):
     return render(request, 'main/home.html')
 
-
 @login_required
 def profile_render(request):
     return render(request, 'registration/profile.html')

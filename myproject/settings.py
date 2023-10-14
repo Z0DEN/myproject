@@ -141,7 +141,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login'
 LOGOUT_URL = '/accounts/logout/'
 LOGIN_REDIRECT_URL = reverse_lazy('MainApp:profile')
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'MainApp.CloudUser'
 
 CSRF_COOKIE_NAME = 'csrftoken'
 

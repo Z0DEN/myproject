@@ -1,22 +1,18 @@
-from MainApp.models import NodeModel
 from django.contrib import messages
 from django.views import View
 from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
-from django.shortcuts import render
-from .forms import CloudUserAuthForm
-from .forms import CloudUserLoginForm
-
+from .forms import CloudUserAuthForm, CloudUserLoginForm
+from MainApp.models import NodeModel
 
 class RegistrationView(CreateView):
-    form_class = CloudUserAuthForm 
+    form_class = CloudUserAuthForm
     template_name = 'registration.html'
-    success_url = reverse_lazy('login')
-    all_nodes = NodeModel.objects.all()
+    success_url = reverse_lazy('MainApp:home')
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -26,8 +22,8 @@ class RegistrationView(CreateView):
         user = authenticate(self.request, username=username, password=password)
 
         if user is not None:
-            node_domain, node_id = self.min_user_quantity_domain()
-            node = NodeModel.objects.get(id=node_id)
+            node = self.min_user_quantity_domain()
+            node_domain = node.node_domain
             node.user_quantity += 1
             node.save()
 
@@ -37,16 +33,16 @@ class RegistrationView(CreateView):
             return redirect('MainApp:profile')
         return response
 
-    def min_user_quantity_domain():
+    def min_user_quantity_domain(self):
         min_user_quantity = float('inf')
         min_user_quantity_node = None
 
-        for node in self.all_nodes:
+        for node in NodeModel.objects.all():
             user_quantity = node.user_quantity
             if user_quantity < min_user_quantity:
                 min_user_quantity = user_quantity
                 min_user_quantity_node = node
-        return min_user_quantity_node, node_id
+        return min_user_quantity_node
 
 
 class LoginView(View):
@@ -65,22 +61,33 @@ class LoginView(View):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home')
+                return redirect('MainApp:home')
             else:
                 form.add_error(None, 'Invalid credentials')
         return render(request, self.template_name, {'form': form})
 
 
-
 def NodeConnection():
     if request.method == 'POST':
-        domain = request.POST.get('domain')
-        if domain:
-            node = NodeModel(node_domain=domain, user_quantity='0')
-            node.save
-            return HttpResponse('Domain saved successfully.')
-        else:
-            return HttpResponse('No domain value found in the POST request.')
+        node_domain = request.POST['node_domain']
+        ip_address = request.POST['ip_address']
+        date = time()
+        
+        if not node_domain:
+            return JsonResponse({'success': False, 'message': 'Неверное доменное имя'})
+        if not ip_address:
+            return JsonResponse({'success': False, 'message': 'Неверный ip адрес'})
+
+        new_node = NodeModel(
+            node_domain=node_domain,
+            ip_address=ip_address,
+            user_quantity=0,
+        )
+
+        new_node.save()
+
+        return JsonResponse({'success': True})
+
     else:
         return HttpResponse('Invalid request method.')
 

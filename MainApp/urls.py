@@ -7,7 +7,8 @@ app_name = 'MainApp'
 urlpatterns = [
     path('', views.home_render, name="home"),
     path('profile/', views.profile_render, name="profile"),
-    path('register/', RegistrationView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
+    path('reg/', RegistrationView.as_view(), name='register'),
+    path('NodeConnection/', views.NodeConnection),
+#    path('login/', LoginView.as_view(), name='login'),
 ]
 

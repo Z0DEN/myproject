@@ -10,6 +10,12 @@ class CloudUserAuthForm(UserCreationForm):
     class Meta:
         model = CloudUser
         fields = ('username', 'password1', 'password2')
+        help_texts = {
+            'username': None,
+            'password1': None,
+            'password2': None,
+        }
+
 
 
 class CloudUserLoginForm(UserCreationForm):
@@ -17,5 +23,6 @@ class CloudUserLoginForm(UserCreationForm):
 
     class Meta:
         model = CloudUser
-        fields = ('username', 'password1')
+        fields = ('username', 'password1', 'password2')
+        exclude = ['password2']
 

@@ -6,6 +6,6 @@ class CloudUser(AbstractUser):
 
 
 class NodeModel():
-    node_domain = models.CharField(max_length=20 unique=True)
+    node_domain = models.CharField(max_length=20, unique=True)
     user_quantity = models.CharField(max_length=10)
     date_added = models.DateTimeField(auto_now_add=True)

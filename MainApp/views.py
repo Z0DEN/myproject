@@ -1,4 +1,4 @@
-from MainApp.models import Node_model
+from MainApp.models import NodeModel
 from django.contrib import messages
 from django.views import View
 from django.contrib.auth import authenticate, login

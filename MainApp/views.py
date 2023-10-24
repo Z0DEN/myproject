@@ -1,13 +1,14 @@
+from django.http import HttpResponse
 from django.contrib import messages
 from django.views import View
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
-from .forms import CloudUserAuthForm, CloudUserLoginForm
 from MainApp.models import NodeModel
+from .forms import CloudUserAuthForm, CloudUserLoginForm
 
 class RegistrationView(CreateView):
     form_class = CloudUserAuthForm
@@ -67,12 +68,13 @@ class LoginView(View):
         return render(request, self.template_name, {'form': form})
 
 
-def NodeConnection():
+@csrf_exempt
+def NodeConnection(request):
     if request.method == 'POST':
+
         node_domain = request.POST['node_domain']
         ip_address = request.POST['ip_address']
-        date = time()
-        
+
         if not node_domain:
             return JsonResponse({'success': False, 'message': 'Неверное доменное имя'})
         if not ip_address:
@@ -86,9 +88,19 @@ def NodeConnection():
 
         new_node.save()
 
-        return JsonResponse({'success': True})
+        # Add a Content-Type header to the response
+        response = JsonResponse({
+            'success': True,
+            'node_domain': node_domain,
+            'ip_address': ip_address,
+            'date': date,
+        })
+        response['Content-Type'] = 'application/json'
+
+        return response
 
     else:
+        print('method=get')
         return HttpResponse('Invalid request method.')
 
 

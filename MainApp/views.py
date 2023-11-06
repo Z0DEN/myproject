@@ -1,24 +1,29 @@
-from django.http import HttpResponse
+import json
+
 from django.contrib import messages
-from django.views import View
 from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from django.views.generic import CreateView
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.generic import CreateView
+
 from MainApp.models import NodeModel
+
 from .forms import CloudUserAuthForm, CloudUserLoginForm
+
 
 class RegistrationView(CreateView):
     form_class = CloudUserAuthForm
-    template_name = 'registration.html'
-    success_url = reverse_lazy('MainApp:home')
+    template_name = "registration.html"
+    success_url = reverse_lazy("MainApp:home")
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password1']
+        username = form.cleaned_data["username"]
+        password = form.cleaned_data["password1"]
 
         user = authenticate(self.request, username=username, password=password)
 
@@ -31,11 +36,11 @@ class RegistrationView(CreateView):
             user.node_domain = node_domain
             user.save()
             login(self.request, user)
-            return redirect('MainApp:profile')
+            return redirect("MainApp:profile")
         return response
 
     def min_user_quantity_domain(self):
-        min_user_quantity = float('inf')
+        min_user_quantity = float("inf")
         min_user_quantity_node = None
 
         for node in NodeModel.objects.all():
@@ -48,68 +53,58 @@ class RegistrationView(CreateView):
 
 class LoginView(View):
     form_class = CloudUserLoginForm
-    template_name = 'login.html'
+    template_name = "login.html"
 
     def get(self, request):
         form = self.form_class()
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {"form": form})
 
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password1")
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('MainApp:home')
+                return redirect("MainApp:home")
             else:
-                form.add_error(None, 'Invalid credentials')
-        return render(request, self.template_name, {'form': form})
+                form.add_error(None, "Invalid credentials")
+        return render(request, self.template_name, {"form": form})
 
 
 @csrf_exempt
 def NodeConnection(request):
-    if request.method == 'POST':
+    if request.method == "POST":
+        data = json.loads(request.body)
 
-        node_domain = request.POST['node_domain']
-        ip_address = request.POST['ip_address']
+        node_domain = data.get("node_domain")
+        IN_IP = data.get("IN_IP")
+        EX_IP = data.get("EX_IP")
 
-        if not node_domain:
-            return JsonResponse({'success': False, 'message': 'Неверное доменное имя'})
-        if not ip_address:
-            return JsonResponse({'success': False, 'message': 'Неверный ip адрес'})
+        try:
+            existing_node = NodeModel.objects.get(node_domain=node_domain)
+            return HttpResponse("Узел уже существует.", status=400)  # Отправить ошибку с кодом 400
 
-        new_node = NodeModel(
-            node_domain=node_domain,
-            ip_address=ip_address,
-            user_quantity=0,
-        )
-
-        new_node.save()
-
-        # Add a Content-Type header to the response
-        response = JsonResponse({
-            'success': True,
-            'node_domain': node_domain,
-            'ip_address': ip_address,
-            'date': date,
-        })
-        response['Content-Type'] = 'application/json'
-
-        return response
+        except NodeModel.DoesNotExist:
+            new_node = NodeModel(
+                node_domain=node_domain,
+                IN_IP=IN_IP,
+                EX_IP=EX_IP,
+                user_quantity=0,
+            )
+            new_node.save()
+            return HttpResponse("Узел успешно создан.")  # Отправить успешный ответ
 
     else:
-        print('method=get')
-        return HttpResponse('Invalid request method.')
+        return HttpResponse("Invalid request method.", status=405)  # Отправить ошибку с кодом 405
 
 
 @csrf_protect
 def home_render(request):
-    return render(request, 'main/home.html')
+    return render(request, "main/home.html")
 
 
 @login_required
 def profile_render(request):
-    return render(request, 'registration/profile.html')
-
+    return render(request, "registration/profile.html")

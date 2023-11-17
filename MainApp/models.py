@@ -10,9 +10,9 @@ class NodeModel(models.Model):
     node_domain = models.CharField(max_length=20, unique=True)
     user_quantity = models.IntegerField()
     date_added = models.DateTimeField(auto_now_add=True)
-    IN_IP = models.CharField(max_length=12, unique=True)
-    EX_IP = models.CharField(max_length=12, unique=True)
-    UUID = models.CharField(max_length=32, unique=True)
+    IN_IP = models.CharField(max_length=15, unique=True)
+    EX_IP = models.CharField(max_length=15, unique=True)
+    UUID = models.CharField(max_length=32, default='00000000000000000000000000000000',unique=True)
 
-    def __str__(self):
-        return self.node_domain
+    #    def __str__(self):
+    #    return self.node_domain, self.EX_IP

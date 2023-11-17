@@ -95,17 +95,19 @@ def NodeConnection(request):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     def IsNodeExist(node_domain, IN_IP, EX_IP):
-        arg_dict = {'node_domain': node_domain, 'IN_IP': IN_IP, 'EX_IP': EX_IP}
+        arg_dict = {"node_domain": node_domain, "IN_IP": IN_IP, "EX_IP": EX_IP}
         ResponseText = "Узел с данными параметрами уже существует: "
         var = 0
+        existing_values = []
         for arg_key, arg_value in arg_dict.items():
             if NodeModel.objects.filter(**{arg_key: arg_value}).exists():
-                ResponseText += str(arg_value)
+                arg_string = f"{arg_key}: {arg_value}"
+                existing_values.append(str(arg_string))
                 var += 1
         if var != 0:
+            ResponseText += ", ".join(existing_values)
             return ResponseText, True
         return ResponseText, False
-
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 

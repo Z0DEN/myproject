@@ -1,5 +1,7 @@
 import json
 
+from django.conf import settings
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -173,7 +175,9 @@ def home_render(request):
 
 @login_required
 def profile_render(request):
-    return render(request, "registration/profile.html")
+    MY_VARIABLES = settings.MY_VARIABLES
+    context = MY_VARIABLES 
+    return render(request, "registration/profile.html",context)
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===

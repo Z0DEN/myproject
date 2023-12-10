@@ -15,7 +15,7 @@ import os
 
 ALLOWED_HOSTS = ['localhost','192.168.0.98','176.197.34.213','cloudblesk.site','127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://cloudblesk.site']
+CSRF_TRUSTED_ORIGINS = ['https://localhost','http://localhost']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,6 +58,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "https://cloudblesk.site",
+    "http://localhost",
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -162,3 +163,15 @@ LOGGING = {
             'propagate': True,
         },
     }, }
+
+
+# ------------------------------------------------------------- #
+#                           VARIABLES                           #
+# ------------------------------------------------------------- #
+
+#SITE_DOMAIN = os.environ.get("domain")
+MY_VARIABLES = {
+    "SITE_DOMAIN":"localhost",
+}
+
+

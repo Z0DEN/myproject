@@ -17,10 +17,11 @@
           <p>Username: {{ user.username }}</p>
           <p>Email: {{ user.email }}</p>
           <p>Node domain: {{ user.node_domain }}</p>
+          <p>Site domain: {{ SITE_DOMAIN }}</p>
         </div>
       <div>
         <h3>
-          <a href="https://cloudblesk.site/accounts/logout/">Выйти из аккаунта</a>
+		<a href="https://{{ SITE_DOMAIN }}/accounts/logout/">Выйти из аккаунта</a>
         </h3>
       </div>
 </body>

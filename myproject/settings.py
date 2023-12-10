@@ -15,7 +15,7 @@ import os
 
 ALLOWED_HOSTS = ['localhost','192.168.0.98','176.197.34.213','cloudblesk.site','127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://localhost','http://localhost']
+CSRF_TRUSTED_ORIGINS = ['https://localhost','http://localhost', 'http://192.168.0.98', 'https://192.168.0.98']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -170,8 +170,9 @@ LOGGING = {
 # ------------------------------------------------------------- #
 
 #SITE_DOMAIN = os.environ.get("domain")
+
 MY_VARIABLES = {
-    "SITE_DOMAIN":"localhost",
+    "SITE_DOMAIN":"192.168.0.98",
 }
 
 

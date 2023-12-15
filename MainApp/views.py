@@ -4,6 +4,7 @@ import secrets
 from datetime import datetime, timedelta
 
 import jwt
+import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -46,14 +47,25 @@ class RegistrationView(CreateView):
             user.node_domain = node_domain
             user.save()
             login(self.request, user)
-            AddUser(user)
+            self.AddUser(user)
             return redirect("MainApp:profile")
         return response
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    def AddUser(user):
-        :
+    def AddUser(self, user):
+        user_node = user.node_domain
+        node = NodeModel.objects.get(node_domain=user_node)
+        if node.local_connection:
+            url = f"https://{node.IN_IP}:8002/AddUser/"
+        else:
+            url = f"https://{node.EX_IP}:8002/AddUser/"
+
+        data = {
+            "username": user.username,
+        }
+
+        requests.post(url, data=data, verify=False)
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
@@ -99,11 +111,12 @@ class LoginView(View):
 
 @csrf_exempt
 def NodeConnection(request):
-    def ChangeData(node_domain, IN_IP, EX_IP, UUID):
+    def ChangeData(node_domain, IN_IP, EX_IP, UUID, local_connection):
         node = NodeModel.objects.get(UUID=UUID)
         node.node_domain = node_domain
         node.IN_IP = IN_IP
         node.EX_IP = EX_IP
+        node.local_connection = local_connection
         node.save()
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -125,19 +138,21 @@ def NodeConnection(request):
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    def CreateNewNode(node_domain, IN_IP, EX_IP, UUID):
+    def CreateNewNode(node_domain, IN_IP, EX_IP, UUID, local_connection):
         if NodeModel.objects.filter(UUID=UUID).exists():
             if NodeModel.objects.filter(
-                node_domain=node_domain, IN_IP=IN_IP, EX_IP=EX_IP
+                node_domain=node_domain,
+                IN_IP=IN_IP,
+                EX_IP=EX_IP,
+                local_connection=local_connection,
             ):
                 return "Данный узел уже существует.", 400
-            ChangeData(node_domain, IN_IP, EX_IP, UUID)
+            ChangeData(node_domain, IN_IP, EX_IP, UUID, local_connection)
             return "Данные узла обновлены.", 200
-
-        ResponseText, success = IsNodeExist(node_domain, IN_IP, EX_IP)
-
-        if success:
-            return ResponseText, 400
+        else:
+            ResponseText, success = IsNodeExist(node_domain, IN_IP, EX_IP)
+            if success:
+                return ResponseText, 400
 
         new_node = NodeModel(
             node_domain=node_domain,
@@ -145,6 +160,7 @@ def NodeConnection(request):
             EX_IP=EX_IP,
             UUID=UUID,
             user_quantity=0,
+            local_connection=local_connection,
         )
         new_node.save()
         return "Узел успешно создан.", 200
@@ -162,15 +178,22 @@ def NodeConnection(request):
     IN_IP = data.get("IN_IP")
     EX_IP = data.get("EX_IP")
     UUID = data.get("UUID")
+    local_connection = data.get("local_connection")
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    if node_domain is None or IN_IP is None or EX_IP is None or UUID is None:
+    if (
+        node_domain is None
+        or IN_IP is None
+        or EX_IP is None
+        or UUID is None
+        or local_connection is None
+    ):
         return HttpResponse("Недостаточно данных для создания узла.", status=400)
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    Response, status = CreateNewNode(node_domain, IN_IP, EX_IP, UUID)
+    Response, status = CreateNewNode(node_domain, IN_IP, EX_IP, UUID, local_connection)
     return HttpResponse(Response, status=status)
 
 
@@ -220,7 +243,12 @@ def get_token(request):
     access_token = generate_token(access_payload, secret_key)
     refresh_token = generate_token(refresh_payload, secret_key)
 
-    token = UserToken.objects.create(user=user_model, access_token=access_token, refresh_token=refresh_token, secret_key=secret_key)
+    token = UserToken.objects.create(
+        user=user_model,
+        access_token=access_token,
+        refresh_token=refresh_token,
+        secret_key=secret_key,
+    )
 
     json_data = {
         "access_token": access_token,

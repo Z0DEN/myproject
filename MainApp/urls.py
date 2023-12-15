@@ -9,6 +9,7 @@ urlpatterns = [
     path('profile/', views.profile_render, name="profile"),
     path('reg/', RegistrationView.as_view(), name='register'),
     path('NodeConnection/', views.NodeConnection),
-#    path('login/', LoginView.as_view(), name='login'),
+    path('get_token/', views.get_token, name="get_token"),
+    path('token_verify/', views.token_verify, name="token_verify"),
 ]
 

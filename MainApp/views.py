@@ -22,6 +22,7 @@ from .forms import CloudUserAuthForm, CloudUserLoginForm
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
+global status_list
 
 class RegistrationView(CreateView):
     form_class = CloudUserAuthForm
@@ -111,64 +112,64 @@ class LoginView(View):
 
 @csrf_exempt
 def NodeConnection(request):
-    def ChangeData(node_domain, IN_IP, EX_IP, UUID, local_connection):
+    global response_data
+    response_data = {
+        "msg": "",
+        "status": 0,
+    }
+
+    def ChangeData(data_list):
         node = NodeModel.objects.get(UUID=UUID)
-        node.node_domain = node_domain
-        node.IN_IP = IN_IP
-        node.EX_IP = EX_IP
-        node.local_connection = local_connection
+        for item in data_list:
+            for key, value in item.items():
+                node.__setattr__(key, value)
         node.save()
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    def IsNodeExist(node_domain, IN_IP, EX_IP):
-        arg_dict = {"node_domain": node_domain, "IN_IP": IN_IP, "EX_IP": EX_IP}
-        ResponseText = "Узел с данными параметрами уже существует: "
+    def IsNodeExist(data_list):
+        ResponseText = "Node with the following details already exists: "
         var = 0
         existing_values = []
-        for arg_key, arg_value in arg_dict.items():
+        for arg_key, arg_value in data_list.items():
             if NodeModel.objects.filter(**{arg_key: arg_value}).exists():
                 arg_string = f"{arg_key}: {arg_value}"
                 existing_values.append(str(arg_string))
                 var += 1
         if var != 0:
             ResponseText += ", ".join(existing_values)
-            return ResponseText, True
-        return ResponseText, False
+            response_data["msg"] = ResponseText
+            return True
+        return False
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    def CreateNewNode(node_domain, IN_IP, EX_IP, UUID, local_connection):
+    def CreateNewNode(data_list):
         if NodeModel.objects.filter(UUID=UUID).exists():
-            if NodeModel.objects.filter(
-                node_domain=node_domain,
-                IN_IP=IN_IP,
-                EX_IP=EX_IP,
-                local_connection=local_connection,
-            ):
-                return "Данный узел уже существует.", 400
-            ChangeData(node_domain, IN_IP, EX_IP, UUID, local_connection)
-            return "Данные узла обновлены.", 200
+            node_exists = NodeModel.objects.filter(**data_list).exists()
+            if node_exists:
+                return 11
+            ChangeData(data_list)
+            return 20
         else:
-            ResponseText, success = IsNodeExist(node_domain, IN_IP, EX_IP)
-            if success:
-                return ResponseText, 400
+            status = IsNodeExist(data_list)
+            if status:
+                return 11
 
-        new_node = NodeModel(
-            node_domain=node_domain,
-            IN_IP=IN_IP,
-            EX_IP=EX_IP,
-            UUID=UUID,
-            user_quantity=0,
-            local_connection=local_connection,
-        )
+        new_node = NodeModel()
+        for item in data_list:
+            for key, value in item.items():
+                new_node.__setattr__(key, value)
         new_node.save()
-        return "Узел успешно создан.", 200
+
+        return 21
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     if request.method != "POST":
-        return HttpResponse("Invalid request method.", status=405)
+        response_data["msg"] = status_list[12]
+        response_data["status"] = 12
+        return JsonResponse(response_data)
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
@@ -180,6 +181,7 @@ def NodeConnection(request):
     UUID = data.get("UUID")
     local_connection = data.get("local_connection")
 
+    data_list = [{key: value} for key, value in data.items()]
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     if (
@@ -189,12 +191,15 @@ def NodeConnection(request):
         or UUID is None
         or local_connection is None
     ):
-        return HttpResponse("Недостаточно данных для создания узла.", status=400)
-
+        response_data["msg"] = status_list[13]
+        response_data["status"] = 13
+        return JsonResponse(response_data)
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    Response, status = CreateNewNode(node_domain, IN_IP, EX_IP, UUID, local_connection)
-    return HttpResponse(Response, status=status)
+    status = CreateNewNode(data_list)
+    response_data["msg"] = status_list[status]
+    response_data["status"] = status
+    return JsonResponse(response_data)
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
@@ -208,11 +213,11 @@ def generate_token(payload, secret_key):
 def decode_token(token, secret_key):
     try:
         decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
-        return "Token is Valid", 0
+        return decoded, 22
     except jwt.ExpiredSignatureError:
-        return "Token is expired", 1
+        return 14
     except jwt.InvalidTokenError:
-        return "Invalid Token", 2
+        return 15
 
 
 @login_required
@@ -253,9 +258,11 @@ def get_token(request):
     json_data = {
         "access_token": access_token,
         "refresh_token": refresh_token,
+        "status": 20,
+        "msg": status_list[20],
     }
 
-    return JsonResponse(json_data, safe=False)
+    return JsonResponse(json_data)
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
@@ -298,7 +305,6 @@ def update_token(user, new_token):
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
-
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
@@ -318,3 +324,30 @@ def profile_render(request):
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
+
+
+# ------------------------------------------------------------- #
+#                            STATUSES                           #
+# ------------------------------------------------------------- #
+#   1<..>  -> Error
+#   2<..>  -> Success
+#   3<..>  -> Warning
+#   4<..>  -> Info
+
+status_list = {
+    10: "Undefined error",
+    11: "Node already exists",
+    12: "Invalid request method",
+    13: "Invalid request data",
+    14: "Token is expired",
+    15: "Invalid Token",
+    # ------------------------------------------------------------- #
+    20: "Undefined success",
+    21: "Node was successfully created",
+    22: "Token is Valid",
+    23: "Data successfully changed",
+    # ------------------------------------------------------------- #
+    30: "Undefined warning",
+    # ------------------------------------------------------------- #
+    40: "Undefined info",
+}

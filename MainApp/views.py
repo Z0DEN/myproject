@@ -123,9 +123,12 @@ def NodeConnection(request):
 
     def ChangeData(data):
         node = NodeModel.objects.get(UUID=UUID)
-        for key, value in item.items():
-            node.__setattr__(key, value)
+        for key, value in data.items():
+            if key != "user_quantity" and key != "access_token" and key != "refresh_token":
+                node.key = value
         node.save()
+        accesss_token, refresh_token = node_token_update(data)
+        return  accesss_token, refresh_token
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
@@ -159,8 +162,8 @@ def NodeConnection(request):
             node_exists = NodeModel.objects.filter(**data).exists()
             if node_exists:
                 return None, None, 11
-            ChangeData(data)
-            return None, None, 20
+            new_access_token, new_refresh_token = ChangeData(data)
+            return new_access_token, new_refresh_token, 23
         else:
             status = IsNodeExist(data)
             print(status)
@@ -334,13 +337,65 @@ def token_verify(request):
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
-def update_token(user, new_token):
-    user.token = generate_token()
-    user.save()
+def node_token_update(data):
+    new_secret_key = secrets.token_hex(32)
+    issued_at = datetime.utcnow()
+    access_expiration = issued_at + timedelta(minutes=100)
+    refresh_expiration = issued_at + timedelta(hours=1)
+
+    refresh_payload = {
+        "sub": data["UUID"],
+        "exp": refresh_expiration,
+        "iat": issued_at,
+    }
+
+    access_payload = {
+        "sub": data["UUID"],
+        "exp": access_expiration,
+        "iat": issued_at,
+    }
+
+    new_node_access_token = generate_token(access_payload, new_secret_key)
+    new_node_refresh_token = generate_token(refresh_payload, new_secret_key)
+
+    node = NodeModel.objects.get(UUID=data["UUID"])
+    node.access_token = new_node_access_token
+    node.refresh_token = new_node_refresh_token
+    node.secret_key = new_secret_key
+    node.save()
+    return new_node_access_token, new_node_refresh_token
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
+
+def user_token_update(data):
+    scopes = ["read", "write"]
+    issued_at = datetime.utcnow()
+    access_expiration = issued_at + timedelta(minutes=100)
+    refresh_expiration = issued_at + timedelta(hours=1)
+
+    refresh_payload = {
+        "sub": data["username"],
+        "exp": refresh_expiration,
+        "iat": issued_at,
+        "scopes": scopes,
+    }
+
+    access_payload = {
+        "sub": data["username"],
+        "exp": access_expiration,
+        "iat": issued_at,
+        "scopes": scopes,
+    }
+    new_secret_key = secrets.token_hex(32)
+    new_access_token = generate_token(access_payload, new_secret_key)
+    new_refresh_token = generate_token(refresh_payload, new_secret_key)
+    user = CloudUser.objects.get(username=data["username"])
+    user.access_token = new_access_token
+    user.refresh_token = new_refresh_token
+    user.secret_key = new_secret_key
+    user.save()
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 

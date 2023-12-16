@@ -24,6 +24,7 @@ from .forms import CloudUserAuthForm, CloudUserLoginForm
 
 global status_list
 
+
 class RegistrationView(CreateView):
     form_class = CloudUserAuthForm
 
@@ -116,6 +117,8 @@ def NodeConnection(request):
     response_data = {
         "msg": "",
         "status": 0,
+        "access_token": "",
+        "refresh_token": "",
     }
 
     def ChangeData(data_list):
@@ -148,21 +151,43 @@ def NodeConnection(request):
         if NodeModel.objects.filter(UUID=UUID).exists():
             node_exists = NodeModel.objects.filter(**data_list).exists()
             if node_exists:
-                return 11
+                return None, None, 11
             ChangeData(data_list)
-            return 20
+            return None, None, 20
         else:
             status = IsNodeExist(data_list)
             if status:
-                return 11
+                return None, None, 11
 
         new_node = NodeModel()
         for item in data_list:
             for key, value in item.items():
                 new_node.__setattr__(key, value)
+
+        secret_key = secrets.token_hex(32)
+        issued_at = datetime.utcnow()
+        access_expiration = issued_at + timedelta(minutes=100)
+        refresh_expiration = issued_at + timedelta(hours=1)
+
+        refresh_payload = {
+            "sub": data_list["UUID"],
+            "exp": refresh_expiration,
+            "iat": issued_at,
+        }
+
+        access_payload = {
+            "sub": data_list["UUID"],
+            "exp": access_expiration,
+            "iat": issued_at,
+        }
+        node_access_token = generate_token(access_payload, secret_key)
+        node_refresh_token = generate_token(refresh_payload, secret_key)
+        new_node.access_token = node_access_token
+        new_node.refresh_token = node_refresh_token
+        new_node.secret_key = secret_key 
         new_node.save()
 
-        return 21
+        return node_access_token, node_refresh_token, 21
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
@@ -196,9 +221,13 @@ def NodeConnection(request):
         return JsonResponse(response_data)
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    status = CreateNewNode(data_list)
-    response_data["msg"] = status_list[status]
-    response_data["status"] = status
+    node_access_token, node_refresh_token, status = CreateNewNode(data_list)
+    response_data = {
+        "msg": status_list[status],
+        "status": status,
+        "access_token": node_access_token,
+        "refresh_token": node_refresh_token
+    }
     return JsonResponse(response_data)
 
 
@@ -256,10 +285,10 @@ def get_token(request):
     )
 
     json_data = {
+        "msg": status_list[20],
+        "status": 20,
         "access_token": access_token,
         "refresh_token": refresh_token,
-        "status": 20,
-        "msg": status_list[20],
     }
 
     return JsonResponse(json_data)

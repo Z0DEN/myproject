@@ -19,10 +19,8 @@ class NodeModel(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     IN_IP = models.CharField(max_length=15, unique=True)
     EX_IP = models.CharField(max_length=15, unique=True)
-    UUID = models.CharField(
-        max_length=32, default="00000000000000000000000000000000", unique=True
-    )
+    UUID = models.CharField(max_length=32, unique=True)
     local_connection = models.CharField(max_length=5, default="False")
-
-    #    def __str__(self):
-    #    return self.node_domain, self.EX_IP
+    access_token = models.CharField(max_length=256)
+    refresh_token = models.CharField(max_length=256)
+    secret_key = models.CharField(max_length=64)

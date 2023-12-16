@@ -121,24 +121,31 @@ def NodeConnection(request):
         "refresh_token": "",
     }
 
-    def ChangeData(data_list):
+    def ChangeData(data):
         node = NodeModel.objects.get(UUID=UUID)
-        for item in data_list:
-            for key, value in item.items():
-                node.__setattr__(key, value)
+        for key, value in item.items():
+            node.__setattr__(key, value)
         node.save()
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    def IsNodeExist(data_list):
+    def IsNodeExist(data):
+        print("подключение новой ноды, проверяем есть ли похожие данные у других узлов")
         ResponseText = "Node with the following details already exists: "
         var = 0
         existing_values = []
-        for arg_key, arg_value in data_list.items():
-            if NodeModel.objects.filter(**{arg_key: arg_value}).exists():
-                arg_string = f"{arg_key}: {arg_value}"
+        print(data)
+        for key, value in data.items():
+            if (
+                key != "local_connection"
+                and NodeModel.objects.filter(**{key: value}).exists()
+            ):
+                print(key, ", ", value)
+                print(NodeModel.objects.filter(**{key: value}).exists())
+                arg_string = f"{key}: {value}"
                 existing_values.append(str(arg_string))
                 var += 1
+                print(var)
         if var != 0:
             ResponseText += ", ".join(existing_values)
             response_data["msg"] = ResponseText
@@ -147,22 +154,18 @@ def NodeConnection(request):
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    def CreateNewNode(data_list):
-        if NodeModel.objects.filter(UUID=UUID).exists():
-            node_exists = NodeModel.objects.filter(**data_list).exists()
+    def CreateNewNode(data):
+        if NodeModel.objects.filter(UUID=data["UUID"]).exists():
+            node_exists = NodeModel.objects.filter(**data).exists()
             if node_exists:
                 return None, None, 11
-            ChangeData(data_list)
+            ChangeData(data)
             return None, None, 20
         else:
-            status = IsNodeExist(data_list)
+            status = IsNodeExist(data)
+            print(status)
             if status:
                 return None, None, 11
-
-        new_node = NodeModel()
-        for item in data_list:
-            for key, value in item.items():
-                new_node.__setattr__(key, value)
 
         secret_key = secrets.token_hex(32)
         issued_at = datetime.utcnow()
@@ -170,21 +173,26 @@ def NodeConnection(request):
         refresh_expiration = issued_at + timedelta(hours=1)
 
         refresh_payload = {
-            "sub": data_list["UUID"],
+            "sub": data["UUID"],
             "exp": refresh_expiration,
             "iat": issued_at,
         }
 
         access_payload = {
-            "sub": data_list["UUID"],
+            "sub": data["UUID"],
             "exp": access_expiration,
             "iat": issued_at,
         }
+
         node_access_token = generate_token(access_payload, secret_key)
         node_refresh_token = generate_token(refresh_payload, secret_key)
-        new_node.access_token = node_access_token
-        new_node.refresh_token = node_refresh_token
-        new_node.secret_key = secret_key 
+
+        data["user_quantity"] = 0
+        data["access_token"] = node_access_token
+        data["refresh_token"] = node_refresh_token
+        data["secret_key"] = secret_key
+
+        new_node = NodeModel(**data)
         new_node.save()
 
         return node_access_token, node_refresh_token, 21
@@ -200,13 +208,12 @@ def NodeConnection(request):
 
     data = json.loads(request.body)
 
-    node_domain = data.get("node_domain")
-    IN_IP = data.get("IN_IP")
-    EX_IP = data.get("EX_IP")
-    UUID = data.get("UUID")
-    local_connection = data.get("local_connection")
+    node_domain = data["node_domain"]
+    IN_IP = data["IN_IP"]
+    EX_IP = data["EX_IP"]
+    UUID = data["UUID"]
+    local_connection = data["local_connection"]
 
-    data_list = [{key: value} for key, value in data.items()]
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     if (
@@ -221,12 +228,13 @@ def NodeConnection(request):
         return JsonResponse(response_data)
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    node_access_token, node_refresh_token, status = CreateNewNode(data_list)
+    print(data)
+    node_access_token, node_refresh_token, status = CreateNewNode(data)
     response_data = {
         "msg": status_list[status],
         "status": status,
         "access_token": node_access_token,
-        "refresh_token": node_refresh_token
+        "refresh_token": node_refresh_token,
     }
     return JsonResponse(response_data)
 

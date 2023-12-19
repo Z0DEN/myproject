@@ -24,6 +24,26 @@ from .forms import CloudUserAuthForm, CloudUserLoginForm
 
 global status_list
 
+# ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
+
+
+def generate_token(payload, secret_key):
+    token = jwt.encode(payload, secret_key, algorithm="HS256")
+    return token
+
+
+def decode_token(token, secret_key):
+    try:
+        decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
+        return decoded, 22
+    except jwt.ExpiredSignatureError:
+        return 14
+    except jwt.InvalidTokenError:
+        return 15
+
+
+# ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
+
 
 class RegistrationView(CreateView):
     form_class = CloudUserAuthForm
@@ -56,6 +76,10 @@ class RegistrationView(CreateView):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     def AddUser(self, user):
+        # make a func to validate token
+        # make a func to validate token
+        # make a func to validate token
+        # make a func to validate token
         user_node = user.node_domain
         node = NodeModel.objects.get(node_domain=user_node)
         if node.local_connection:
@@ -133,7 +157,6 @@ def NodeConnection(request):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     def IsNodeExist(data):
-        print("подключение новой ноды, проверяем есть ли похожие данные у других узлов")
         ResponseText = "Node with the following details already exists: "
         var = 0
         existing_values = []
@@ -244,20 +267,6 @@ def NodeConnection(request):
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
-
-def generate_token(payload, secret_key):
-    token = jwt.encode(payload, secret_key, algorithm="HS256")
-    return token
-
-
-def decode_token(token, secret_key):
-    try:
-        decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
-        return decoded, 22
-    except jwt.ExpiredSignatureError:
-        return 14
-    except jwt.InvalidTokenError:
-        return 15
 
 
 @login_required

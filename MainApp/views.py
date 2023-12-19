@@ -427,19 +427,20 @@ def profile_render(request):
 #   4<..>  -> Info
 
 status_list = {
-    10: "Undefined error",
-    11: "Node already exists",
-    12: "Invalid request method",
-    13: "Invalid request data",
-    14: "Token is expired",
-    15: "Invalid Token",
+    10: "Undefined error. ",
+    11: "Node already exists. ",
+    12: "Invalid request method. ",
+    13: "Invalid request data. ",
+    14: "Token is expired. ",
+    15: "Invalid Token. ",
+    16: "Request have no auth token (Bearer). ",
     # ------------------------------------------------------------- #
-    20: "Undefined success",
-    21: "Node was successfully created",
-    22: "Token is Valid",
-    23: "Data successfully changed",
+    20: "Undefined success. ",
+    21: "Node or user was successfully created. ",
+    22: "Token is Valid. ",
+    23: "Data successfully changed. ",
     # ------------------------------------------------------------- #
-    30: "Undefined warning",
+    30: "Undefined warning. ",
     # ------------------------------------------------------------- #
-    40: "Undefined info",
+    40: "Undefined info. ",
 }

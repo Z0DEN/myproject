@@ -8,8 +8,8 @@ class CloudUser(AbstractUser):
 
 class UserToken(models.Model):
     user = models.OneToOneField(CloudUser, on_delete=models.CASCADE)
-    access_token = models.CharField(max_length=256)
-    refresh_token = models.CharField(max_length=256)
+    user_access_token = models.CharField(max_length=256)
+    user_refresh_token = models.CharField(max_length=256)
     secret_key = models.CharField(max_length=64)
 
 
@@ -21,6 +21,8 @@ class NodeModel(models.Model):
     EX_IP = models.CharField(max_length=15, unique=True)
     UUID = models.CharField(max_length=32, unique=True)
     local_connection = models.CharField(max_length=5, default="False")
-    access_token = models.CharField(max_length=256, default="123123123123123123")
-    refresh_token = models.CharField(max_length=256, default="123123123123123123")
+    local_server_access_token = models.CharField(max_length=256, default="123123123123123123")
+    local_server_refresh_token = models.CharField(max_length=256, default="123123123123123123")
+    node_access_token = models.CharField(max_length=256, default="123123123123123123")
+    node_refresh_token = models.CharField(max_length=256, default="123123123123123123")
     secret_key = models.CharField(max_length=64, default="123123123123123123")

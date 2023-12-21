@@ -36,9 +36,9 @@ def decode_token(token, secret_key):
         decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
         return decoded, 22
     except jwt.ExpiredSignatureError:
-        return 14
+        return None, 14
     except jwt.InvalidTokenError:
-        return 15
+        return None, 15
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
@@ -68,7 +68,7 @@ class RegistrationView(CreateView):
             user.node_domain = node_domain
             user.save()
             login(self.request, user)
-            self.AddUser(user)
+            #self.AddUser(user)
             return redirect("MainApp:profile")
         return response
 
@@ -145,18 +145,15 @@ def NodeConnection(request):
     }
 
     def ChangeData(data):
-        print("start change data")
-        node = NodeModel.objects.get(UUID=UUID)
+        node = NodeModel.objects.get(UUID=data["UUID"])
         for key, value in data.items():
-            if key != "user_quantity" and key != "node_access_token" and key != "node_refresh_token":
-                node.key = value
+            if key != "user_quantity":
+                setattr(node, key, value)
         node.save()
-        return  accesss_token, refresh_token
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     def IsNodeExist(data):
-        print("start isnodeexist")
         ResponseText = "Node with the following details already exists: "
         var = 0
         existing_values = []
@@ -180,8 +177,9 @@ def NodeConnection(request):
 
     def CreateNewNode(data):
         if NodeModel.objects.filter(UUID=data["UUID"]).exists():
-            print(data)
-            node_exists = NodeModel.objects.filter(local_connection=data['local_connection']).exists()
+            access = data.pop('node_access_token', None)
+            refresh = data.pop('node_refresh_token', None)
+            node_exists = NodeModel.objects.filter(**data).exists()
             if node_exists:
                 return None, None, 11
             ChangeData(data)
@@ -189,8 +187,7 @@ def NodeConnection(request):
         else:
             status = IsNodeExist(data)
             if status:
-                print("node exist")
-                return None, None, 11
+                return None, None, 17
 
         secret_key = secrets.token_hex(32)
         issued_at = datetime.utcnow()
@@ -258,12 +255,15 @@ def NodeConnection(request):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     response_access_token, response_refresh_token, status = CreateNewNode(data)
+
     response_data = {
-        "msg": status_list[status],
+        "msg": response_data["msg"],
         "status": status,
         "access_token": response_access_token,
         "refresh_token": response_refresh_token,
     }
+    if status != 17:
+        response_data["msg"] = status_list[status]
     return JsonResponse(response_data)
 
 
@@ -445,6 +445,7 @@ status_list = {
     14: "Token is expired. ",
     15: "Invalid Token. ",
     16: "Request have no auth token (Bearer). ",
+    17: "Node with the following details already exists. ",
     # ------------------------------------------------------------- #
     20: "Undefined success. ",
     21: "Node or user was successfully created. ",

@@ -41,6 +41,30 @@ def decode_token(token, secret_key):
         return None, 15
 
 
+def get_token_for_node(UUID):
+    secret_key = secrets.token_hex(32)
+    issued_at = datetime.utcnow()
+    access_expiration = issued_at + timedelta(minutes=100)
+    refresh_expiration = issued_at + timedelta(days=7)
+    
+    refresh_payload = {
+        "sub": UUID,
+        "exp": refresh_expiration,
+        "iat": issued_at,
+    }
+    
+    access_payload = {
+        "sub": UUID,
+        "exp": access_expiration,
+        "iat": issued_at,
+    }
+    
+    access_token = generate_token(access_payload, secret_key)
+    refresh_token = generate_token(refresh_payload, secret_key)
+    
+    return access_token, refresh_token, secret_key
+
+
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
@@ -144,13 +168,29 @@ def NodeConnection(request):
         "refresh_token": "",
     }
 
-    def ChangeData(data):
-        node = NodeModel.objects.get(UUID=data["UUID"])
-        for key, value in data.items():
-            if key != "user_quantity":
-                setattr(node, key, value)
-        node.save()
+    def ChangeData(data, node_refresh_token):
+        local_server_refresh_token = getattr(obj, 'local_server_refresh_token')
+        secret_key = getattr(obj, 'secret_key')
+        _, status = decode_token(node_refresh_token, secret_key)
+        
+        if status == 22 and node_refresh_token == local_server_refresh_token:
+            local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data)
+            data["local_server_access_token"] = local_server_access_token
+            data["local_server_refresh_token"] = local_server_refresh_token
+            data["secret_key"] = secret_key
+            NodeModel.objects.filter(UUID=obj.UUID).update(**data)
+            return local_server_access_token, local_server_refresh_token, status
+        else:
+            return None, None, status
 
+
+
+
+#        node = NodeModel.objects.get(UUID=data["UUID"])
+#        for key, value in data.items():
+#            if key != "user_quantity":
+#                setattr(node, key, value)
+#        node.save()
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     def IsNodeExist(data):
@@ -175,39 +215,27 @@ def NodeConnection(request):
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    def CreateNewNode(data):
-        if NodeModel.objects.filter(UUID=data["UUID"]).exists():
+    def CreateNewNode(data, node_refresh_token=None):
+        obj = NodeModel.objects.filter(UUID=data["UUID"])
+        if obj.exists():
+            if node_refresh_token:
+                new_local_access_token, new_local_refresh_token, status = ChangeData(data, node_refresh_token)
+                return new_local_access_token, new_local_refresh_token, status
+
             access = data.pop('node_access_token', None)
             refresh = data.pop('node_refresh_token', None)
             node_exists = NodeModel.objects.filter(**data).exists()
             if node_exists:
                 return None, None, 11
-            ChangeData(data)
-            return None, None, 23
+            else:
+                NodeModel.objects.filter(UUID=obj.UUID).update(**data)
+                return None, None, 23
         else:
             status = IsNodeExist(data)
             if status:
                 return None, None, 17
 
-        secret_key = secrets.token_hex(32)
-        issued_at = datetime.utcnow()
-        access_expiration = issued_at + timedelta(minutes=100)
-        refresh_expiration = issued_at + timedelta(hours=1)
-
-        refresh_payload = {
-            "sub": data["UUID"],
-            "exp": refresh_expiration,
-            "iat": issued_at,
-        }
-
-        access_payload = {
-            "sub": data["UUID"],
-            "exp": access_expiration,
-            "iat": issued_at,
-        }
-
-        local_server_access_token = generate_token(access_payload, secret_key)
-        local_server_refresh_token = generate_token(refresh_payload, secret_key)
+        local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data['UUID'])
 
         data["user_quantity"] = 0
         data["local_server_access_token"] = local_server_access_token
@@ -229,6 +257,7 @@ def NodeConnection(request):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     data = json.loads(request.body)
+    headers = json.loads(request.headers)
 
     node_domain = data["node_domain"]
     IN_IP = data["IN_IP"]
@@ -237,6 +266,9 @@ def NodeConnection(request):
     local_connection = data["local_connection"]
     node_server_access_token = data["node_access_token"]
     node_server_refresh_token = data["node_refresh_token"]
+
+    bearer_header = request.headers.get('Authorization')
+    bearer_token = bearer_header.split(' ')[1]
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
@@ -254,7 +286,8 @@ def NodeConnection(request):
         return JsonResponse(response_data)
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-    response_access_token, response_refresh_token, status = CreateNewNode(data)
+
+    response_access_token, response_refresh_token, status = CreateNewNode(data, bearer_token)
 
     response_data = {
         "msg": response_data["msg"],
@@ -456,3 +489,31 @@ status_list = {
     # ------------------------------------------------------------- #
     40: "Undefined info. ",
 }
+
+# class NodeModel(models.Model):
+#    node_domain = models.CharField(max_length=20, unique=True)
+#    IN_IP = models.CharField(max_length=15, unique=True)
+#    EX_IP = models.CharField(max_length=15, unique=True)
+#    UUID = models.CharField(max_length=32, unique=True)
+#    node_access_token = models.CharField(max_length=256, default="123123123123123123")
+#    node_refresh_token = models.CharField(max_length=256, default="123123123123123123")
+#    local_connection = models.CharField(max_length=5, default="False")
+
+#    local_server_access_token = models.CharField(max_length=256, default="123123123123123123")
+#    local_server_refresh_token = models.CharField(max_length=256, default="123123123123123123")
+#    secret_key = models.CharField(max_length=64, default="123123123123123123")
+
+#    user_quantity = models.IntegerField()
+
+
+
+
+#    node_domain = data["node_domain"]
+#    IN_IP = data["IN_IP"]
+#    EX_IP = data["EX_IP"]
+#    UUID = data["UUID"]
+#    local_connection = data["local_connection"]
+#    node_server_access_token = data["node_access_token"]
+#    node_server_refresh_token = data["node_refresh_token"]
+#
+#    refresh_token ...in headers...

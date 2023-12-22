@@ -183,9 +183,6 @@ def NodeConnection(request):
         else:
             return None, None, status
 
-
-
-
 #        node = NodeModel.objects.get(UUID=data["UUID"])
 #        for key, value in data.items():
 #            if key != "user_quantity":
@@ -218,13 +215,16 @@ def NodeConnection(request):
     def CreateNewNode(data, node_refresh_token=None):
         obj = NodeModel.objects.filter(UUID=data["UUID"])
         if obj.exists():
-            if node_refresh_token:
+            print("start create new node ","node_ref_tok:", node_refresh_token)
+            if node_refresh_token is not None:
+                print("start changing data")
                 new_local_access_token, new_local_refresh_token, status = ChangeData(data, node_refresh_token)
                 return new_local_access_token, new_local_refresh_token, status
 
             access = data.pop('node_access_token', None)
             refresh = data.pop('node_refresh_token', None)
             node_exists = NodeModel.objects.filter(**data).exists()
+            print("node_exists: ", node_exists)
             if node_exists:
                 return None, None, 11
             else:
@@ -257,7 +257,6 @@ def NodeConnection(request):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     data = json.loads(request.body)
-    headers = json.loads(request.headers)
 
     node_domain = data["node_domain"]
     IN_IP = data["IN_IP"]
@@ -269,6 +268,7 @@ def NodeConnection(request):
 
     bearer_header = request.headers.get('Authorization')
     bearer_token = bearer_header.split(' ')[1]
+    print("bearer_token: ", bearer_token)
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 

@@ -25,4 +25,3 @@ class CloudUserLoginForm(UserCreationForm):
         model = CloudUser
         fields = ('username', 'password1', 'password2')
         exclude = ['password2']
-

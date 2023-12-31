@@ -21,8 +21,12 @@ class NodeModel(models.Model):
     EX_IP = models.CharField(max_length=15, unique=True)
     UUID = models.CharField(max_length=32, unique=True)
     local_connection = models.CharField(max_length=5, default="False")
-    local_server_access_token = models.CharField(max_length=256, default="123123123123123123")
-    local_server_refresh_token = models.CharField(max_length=256, default="123123123123123123")
-    node_access_token = models.CharField(max_length=256, default="123123123123123123")
-    node_refresh_token = models.CharField(max_length=256, default="123123123123123123")
-    secret_key = models.CharField(max_length=64, default="123123123123123123")
+    local_server_access_token = models.CharField(max_length=256, default="local_server_access_token")
+    local_server_refresh_token = models.CharField(max_length=256, default="local_server_refresh_token")
+    node_access_token = models.CharField(max_length=256, default="node_access_token")
+    node_refresh_token = models.CharField(max_length=256, default="node_refresh_token")
+    secret_key = models.CharField(max_length=64, default="secret_key")
+
+
+class ServerDataModel(models.Model):
+    personal_key = models.CharField(max_length=64, default="personal_key")

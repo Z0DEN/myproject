@@ -15,7 +15,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView
 
-from MainApp.models import CloudUser, NodeModel, UserToken
+from MainApp.models import CloudUser, NodeModel, UserToken, ServerDataModel
 
 from .forms import CloudUserAuthForm, CloudUserLoginForm
 
@@ -166,19 +166,25 @@ def NodeConnection(request):
     }
 
     def ChangeNodeData(data, token_type, token):
-        obj = NodeModel.objects.filter(UUID=data['UUID'])
-        secret_key = getattr(obj, 'secret_key')
-        _, status = decode_token(token, secret_key)
+        if token_type == 'personal':
+            obj = ServerDataModel.objects.first()
+            local_personal_key = getattr(obj, 'personal_key')
+            if token != local_personal_key:
+                return None, None, 15
 
-        if status == 22:
-            local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data['UUID'])
-            data["local_server_access_token"] = local_server_access_token
-            data["local_server_refresh_token"] = local_server_refresh_token
-            data["secret_key"] = secret_key
-            NodeModel.objects.filter(UUID=data['UUID']).update(**data)
-            return local_server_access_token, local_server_refresh_token, 22
         else:
-            return None, None, status
+            obj = NodeModel.objects.get(UUID=data['UUID'])
+            secret_key = getattr(obj, 'secret_key')
+            _, status = decode_token(token, secret_key)
+            if status != 22:
+                return None, None, status
+
+        local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data['UUID'])
+        data["local_server_access_token"] = local_server_access_token
+        data["local_server_refresh_token"] = local_server_refresh_token
+        data["secret_key"] = secret_key
+        NodeModel.objects.filter(UUID=data['UUID']).update(**data)
+        return local_server_access_token, local_server_refresh_token, 23
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
@@ -208,13 +214,20 @@ def NodeConnection(request):
         obj = NodeModel.objects.filter(UUID=data["UUID"])
         if obj.exists():
             new_local_access_token, new_local_refresh_token, status = ChangeNodeData(data, token_type, token)
+            print('we get new local tokens')
             return new_local_access_token, new_local_refresh_token, status
         else:
             status = IsNodeExist(data)
             if status:
                 return None, None, 17
 
+        obj = ServerDataModel.objects.first()
+        local_personal_key = getattr(obj, 'personal_key')
+        if token != local_personal_key:
+            return None, None, 15
+
         local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data['UUID'])
+        print('gettin new data')
 
         data["user_quantity"] = 0
         data["local_server_access_token"] = local_server_access_token

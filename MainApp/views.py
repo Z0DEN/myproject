@@ -45,14 +45,17 @@ def get_token_for_node(UUID):
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
     access_expiration = issued_at + timedelta(minutes=100)
+    refresh_expiration = issued_at + timedelta(days=7)
     
     refresh_payload = {
         "sub": UUID,
+        "exp": refresh_expiration,
         "iat": issued_at,
     }
     
     access_payload = {
         "sub": UUID,
+        "exp": access_expiration,
         "iat": issued_at,
     }
     

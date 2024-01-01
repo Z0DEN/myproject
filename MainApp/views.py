@@ -1,9 +1,9 @@
+import jwt
+import requests
 import json
 import secrets
 from datetime import datetime, timedelta
-
-import jwt
-import requests
+#from json import JSONDecodeError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -65,6 +65,10 @@ def get_token_for_node(UUID):
     return access_token, refresh_token, secret_key
 
 
+def UpdateNodeTokens():
+    print('updating tokens')
+
+
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
@@ -92,29 +96,42 @@ class RegistrationView(CreateView):
             user.node_domain = node_domain
             user.save()
             login(self.request, user)
-            #self.AddUser(user)
+            
+            data_to_send = {
+                'username': user.username,
+                'node_UUID': node.UUID,
+                'func': 'AddUser',
+            }
+            self.SendData(data_to_send)
             return redirect("MainApp:profile")
         return response
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-
-    def AddUser(self, user):
-        # make a func to validate token
-        # make a func to validate token
-        # make a func to validate token
-        # make a func to validate token
-        user_node = user.node_domain
-        node = NodeModel.objects.get(node_domain=user_node)
+    
+    def SendData(self, data):
+        node_UUID = data.pop('node_UUID')
+        func = data['func']
+        node = NodeModel.objects.get(UUID=node_UUID)
+        access_token = node.node_access_token
+        refresh_token = node.node_refresh_token
         if node.local_connection:
-            url = f"https://{node.IN_IP}:8002/AddUser/"
+            url = f"https://{node.IN_IP}:8002/{func}/"
         else:
-            url = f"https://{node.EX_IP}:8002/AddUser/"
-
-        data = {
-            "username": user.username,
+            url = f"https://{node.EX_IP}:8002/{func}/"
+        headers = {
+            'Authorization': 'server ' + access_token
         }
 
-        requests.post(url, data=data, verify=False)
+        response = requests.post(url, data=data, headers=headers)
+        status = response.json().get('status')
+    
+        if status != 21:
+            headers['Authorization'] = 'server ' + refresh_token
+            response = requests.post(url, data=data, headers=headers)
+            status = response.json().get('status')
+            UpdateNodeTokens()
+            if status != 21:
+                print('All tokens is expired')
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 

@@ -3,7 +3,6 @@ import requests
 import json
 import secrets
 from datetime import datetime, timedelta
-#from json import JSONDecodeError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -15,7 +14,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView
 
-from MainApp.models import CloudUser, NodeModel, UserToken, ServerDataModel
+from MainApp.models import CloudUser, NodeModel, ServerDataModel
 
 from .forms import CloudUserAuthForm, CloudUserLoginForm
 
@@ -115,9 +114,9 @@ class RegistrationView(CreateView):
         access_token = node.node_access_token
         refresh_token = node.node_refresh_token
         if node.local_connection:
-            url = f"https://{node.IN_IP}:8002/{func}/"
+            url = f"http://{node.IN_IP}:8002/{func}/"
         else:
-            url = f"https://{node.EX_IP}:8002/{func}/"
+            url = f"http://{node.EX_IP}:8002/{func}/"
         headers = {
             'Authorization': 'server ' + access_token
         }
@@ -318,9 +317,8 @@ def NodeConnection(request):
 
 
 @login_required
-def get_token(request):
+def GetToken(request):
     secret_key = secrets.token_hex(32)
-
     username = request.user.username
     scopes = ["read", "write"]
     issued_at = datetime.utcnow()
@@ -345,18 +343,16 @@ def get_token(request):
     access_token = generate_token(access_payload, secret_key)
     refresh_token = generate_token(refresh_payload, secret_key)
 
-    token = UserToken.objects.create(
-        user=user_model,
-        user_access_token=access_token,
-        user_refresh_token=refresh_token,
-        secret_key=secret_key,
-    )
+    user_model.user_access_token=access_token
+    user_model.user_refresh_token=refresh_token
+    user_model.secret_key=secret_key
+    user_model.save()
 
     json_data = {
         "msg": status_list[20],
         "status": 20,
-        "access_token": user_access_token,
-        "refresh_token": user_refresh_token,
+        "access_token": access_token,
+        "refresh_token": refresh_token,
     }
 
     return JsonResponse(json_data)
@@ -373,10 +369,7 @@ def token_verify(request):
             return HttpResponse("Неверный тип токена")
     else:
         return HttpResponse("Токен не найден")
-    # user = request.GET.user (запрос из другого сервера, поэтому через get будем передавать юзера, а вот на другом сервере получаем через request.user)
-    # secret_key = "Будем получать из базы данных для данного пользователя"
-    secret_key = "c96270ac89f1b1280792267ba7f63ae625c2040beeebd56ec6e48e638275c435"  # вообще-то secret_key нужно будет получать из базы данных по user из get запроса
-
+    secret_key = "c96270ac89f1b1280792267ba7f63ae625c2040beeebd56ec6e48e638275c435"
     dec_access_token, status = decode_token(token, secret_key)
     if status == 1:
         return HttpResponse("Token is expired", status=status)
@@ -389,38 +382,6 @@ def token_verify(request):
     }
     json_response = json.dumps(json_data)
     return JsonResponse(json_response, safe=False)
-
-
-# ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
-
-
-def node_token_update(data):
-    new_secret_key = secrets.token_hex(32)
-    issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=100)
-    refresh_expiration = issued_at + timedelta(hours=1)
-
-    refresh_payload = {
-        "sub": data["UUID"],
-        "exp": refresh_expiration,
-        "iat": issued_at,
-    }
-
-    access_payload = {
-        "sub": data["UUID"],
-        "exp": access_expiration,
-        "iat": issued_at,
-    }
-
-    new_node_access_token = generate_token(access_payload, new_secret_key)
-    new_node_refresh_token = generate_token(refresh_payload, new_secret_key)
-
-    node = NodeModel.objects.get(UUID=data["UUID"])
-    node.access_token = new_node_access_token
-    node.refresh_token = new_node_refresh_token
-    node.secret_key = new_secret_key
-    node.save()
-    return new_node_access_token, new_node_refresh_token
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===

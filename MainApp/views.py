@@ -135,15 +135,8 @@ class RegistrationView(CreateView):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     def min_user_quantity_domain(self):
-        min_user_quantity = float("inf")
-        min_user_quantity_node = None
-
-        for node in NodeModel.objects.all():
-            user_quantity = node.user_quantity
-            if user_quantity < min_user_quantity:
-                min_user_quantity = user_quantity
-                min_user_quantity_node = node
-        return min_user_quantity_node
+   min_user_quantity_node = NodeModel.objects.order_by('user_quantity').first()
+   return min_user_quantity_node
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===

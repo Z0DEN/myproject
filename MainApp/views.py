@@ -15,7 +15,7 @@ from django.views.generic import CreateView
 
 from MainApp.models import CloudUser, NodeModel
 
-from .forms import CloudUserAuthForm
+from .forms import CloudUserAuthForm, RegisterForm 
 from .node import SendData
 from .tokens import *
 
@@ -59,46 +59,45 @@ def GetToken(user):
     return access_token, refresh_token
 
 
-def UpdateNodeTokens():
-    print('updating tokens')
-
-
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
-class RegistrationView(CreateView):
-    form_class = CloudUserAuthForm
+def Registration(request):
+   if request.method != "POST":
+       form = RegisterForm()
+       return render(request, "registration/registration.html", {"form": form})
+   else:
+       form = RegisterForm(request.POST)
+       if not form.is_valid():
+           return render(request, "registration/registration.html", {"form": form})
+       else:
+           form.save()
+           username = form.cleaned_data["username"]
+           password = form.cleaned_data["password1"]
 
-    def get_template_names(self):
-        return ["registration/registration.html"]
+           user = authenticate(request, username=username, password=password)
 
-    success_url = reverse_lazy("MainApp:home")
+           if user is not None:
+               node = NodeModel.objects.order_by('user_quantity').first()
+               node_domain = node.node_domain
+               node.user_quantity += 1
+               node.save()
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        username = form.cleaned_data["username"]
-        password = form.cleaned_data["password1"]
+               user.node_domain = node_domain
+               user.save()
+               login(request, user)
 
-        user = authenticate(self.request, username=username, password=password)
-
-        if user is not None:
-            node = NodeModel.objects.order_by('user_quantity').first()
-            node_domain = node.node_domain
-            node.user_quantity += 1
-            node.save()
-
-            user.node_domain = node_domain
-            user.save()
-            login(self.request, user)
-            
-            data_to_send = {
-                'username': user.username,
-                'node_UUID': node.UUID,
-                'func': 'AddUser',
-            }
-            SendData(data_to_send)
-            return redirect("MainApp:profile")
-        return response
+               data_to_send = {
+                  'username': user.username,
+                  'node_UUID': node.UUID,
+                  'func': 'AddUser',
+               }
+               SendData(data_to_send)
+               access_token, refresh_token = GetToken(user)
+               response = HttpResponseRedirect(reverse('MainApp:profile'))
+               response.set_cookie('access_token', access_token, httponly=True)
+               response.set_cookie('refresh_token', refresh_token, httponly=True)
+               return response
 
 
 def UserLogin(request):
@@ -119,7 +118,11 @@ def UserLogin(request):
 @login_required
 def UserLogout(request):
     logout(request)
-    return redirect("MainApp:profile")
+    response = HttpResponseRedirect(reverse('MainApp:profile'))
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    return response
+    #return redirect("MainApp:profile")
 
 
 def UserTokenUpdate(data):

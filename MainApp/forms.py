@@ -17,11 +17,11 @@ class CloudUserAuthForm(UserCreationForm):
         }
 
 
-
-class CloudUserLoginForm(UserCreationForm):
+class RegisterForm(UserCreationForm):
+    username = forms.CharField(label='Username', widget=forms.TextInput)
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
 
     class Meta:
         model = CloudUser
         fields = ('username', 'password1', 'password2')
-        exclude = ['password2']

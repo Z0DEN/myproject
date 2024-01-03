@@ -36,7 +36,11 @@ def TokenVerify(request):
     print('token verify')
 
 
-def SendData(self, data):
+def UpdateNodeTokens():
+    print('updating tokens')
+
+
+def SendData(data):
     node_UUID = data.pop('node_UUID')
     func = data['func']
     node = NodeModel.objects.get(UUID=node_UUID)

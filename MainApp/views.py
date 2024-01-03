@@ -8,9 +8,9 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import CreateView
@@ -63,6 +63,38 @@ def get_token_for_node(UUID):
     refresh_token = generate_token(refresh_payload, secret_key)
     
     return access_token, refresh_token, secret_key
+
+
+def GetToken(user):
+    secret_key = secrets.token_hex(32)
+    scopes = ["read", "write"]
+    issued_at = datetime.utcnow()
+    access_expiration = issued_at + timedelta(minutes=100)
+    refresh_expiration = issued_at + timedelta(hours=1)
+    user_model = CloudUser.objects.get(username=user.username)
+
+    refresh_payload = {
+        "sub": user.username,
+        "exp": refresh_expiration,
+        "iat": issued_at,
+        "scopes": scopes,
+    }
+
+    access_payload = {
+        "sub": user.username,
+        "exp": access_expiration,
+        "iat": issued_at,
+        "scopes": scopes,
+    }
+
+    access_token = generate_token(access_payload, secret_key)
+    refresh_token = generate_token(refresh_payload, secret_key)
+
+    user.user_access_token=access_token
+    user.user_refresh_token=refresh_token
+    user.secret_key=secret_key
+    user.save()
+    return access_token, refresh_token
 
 
 def UpdateNodeTokens():
@@ -122,8 +154,11 @@ class RegistrationView(CreateView):
             'Authorization': 'server ' + access_token
         }
 
-        response = requests.post(url, data=data, headers=headers)
-        status = response.json().get('status')
+        try:
+            response = requests.post(url, data=data, headers=headers)
+            status = response.json().get('status')
+        except exception as e:
+            pass
     
         if status != 21:
             headers['Authorization'] = 'server ' + refresh_token
@@ -133,19 +168,28 @@ class RegistrationView(CreateView):
             if status != 21:
                 print('All tokens is expired')
 
-    # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+# +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 
 def UserLogin(request):
-   if request.method == 'POST':
-       username = request.POST['username']
-       password = request.POST['password']
-       user = authenticate(request, username=username, password=password)
-       if user is not None:
-           login(request, user)
-           return redirect('MainApp:profile')
-   return render(request, 'registration/login.html')
+    if request.method != 'POST':
+        return render(request, 'registration/login.html')
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        access_token, refresh_token = GetToken(user)
+        response = HttpResponseRedirect(reverse('MainApp:profile'))
+        response.set_cookie('access_token', access_token, httponly=True)
+        response.set_cookie('refresh_token', refresh_token, httponly=True)
+        return response
 
+
+@login_required
+def UserLogout(request):
+    logout(request)
+    return redirect("MainApp:profile")
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
@@ -292,47 +336,6 @@ def NodeConnection(request):
 
 
 
-@login_required
-def GetToken(request):
-    secret_key = secrets.token_hex(32)
-    username = request.user.username
-    scopes = ["read", "write"]
-    issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=100)
-    refresh_expiration = issued_at + timedelta(hours=1)
-    user_model = CloudUser.objects.get(username=username)
-
-    refresh_payload = {
-        "sub": username,
-        "exp": refresh_expiration,
-        "iat": issued_at,
-        "scopes": scopes,
-    }
-
-    access_payload = {
-        "sub": username,
-        "exp": access_expiration,
-        "iat": issued_at,
-        "scopes": scopes,
-    }
-
-    access_token = generate_token(access_payload, secret_key)
-    refresh_token = generate_token(refresh_payload, secret_key)
-
-    user_model.user_access_token=access_token
-    user_model.user_refresh_token=refresh_token
-    user_model.secret_key=secret_key
-    user_model.save()
-
-    json_data = {
-        "msg": status_list[20],
-        "status": 20,
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-    }
-
-    return JsonResponse(json_data)
-
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
@@ -412,10 +415,7 @@ def ProfileRender(request):
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
-@login_required
-def UserLogout(request):
-    logout(request)
-    return redirect("MainApp:profile")
+
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 

@@ -19,3 +19,9 @@ if (localStorage.getItem('access_token') == null){
   console.log('gettin new tokens')
 	fetchTokens();
 }
+
+function logout(){
+  localStorage.removeItem('access_key');
+  localStorage.removeItem('refresh_key');
+  window.location.href = "/logout/";
+}

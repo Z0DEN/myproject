@@ -19,10 +19,8 @@
           <p>Node domain: {{ user.node_domain }}</p>
           <p>Site domain: {{ GREETINGS }}</p>
         </div>
-      <div>
-        <h3>
-		<a href="{% url 'MainApp:logout' %}">Logout</a>
-        </h3>
+      <div class="LogoutButton">
+          <button onclick="logout()">Logout</button>
       </div>
 </body>
 </html>

@@ -2,6 +2,7 @@ import jwt
 import requests
 import json
 import secrets
+from django.core.cache import cache
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -26,6 +27,12 @@ global status_list
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
+
+def CheckUsername(request):
+    username = request.GET.get('username')
+    result = CloudUser.objects.filter(username=username).exists()
+    return JsonResponse({'is_taken': result})
+  
 
 def GetToken(user):
     secret_key = secrets.token_hex(32)

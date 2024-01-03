@@ -61,10 +61,11 @@ def SendData(data):
         pass
 
     if status != 21:
+        UpdateNodeTokens()
+#        SendData(data)
         headers['Authorization'] = 'server ' + refresh_token
         response = requests.post(url, data=data, headers=headers)
         status = response.json().get('status')
-        UpdateNodeTokens()
         if status != 21:
             print('All tokens is expired')
 

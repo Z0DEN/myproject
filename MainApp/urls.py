@@ -6,11 +6,11 @@ app_name = 'MainApp'
 
 urlpatterns = [
     path('', views.HomeRender, name="home"),
-    path('profile/', views.ProfileRender, name="profile"),
-#    path('reg/', views.RegistrationView.as_view(), name='register'),
     path('reg/', views.Registration, name="register"),
+    path('profile/', views.ProfileRender, name="profile"),
     path('logout/', views.UserLogout, name="logout"),
     path('login/', views.UserLogin, name="login"),
+    path('CheckUsername/', views.CheckUsername),
     path('NodeConnection/', node.NodeConnection),
     path('TokenVerify/', node.TokenVerify),
 ]

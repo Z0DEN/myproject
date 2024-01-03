@@ -88,7 +88,7 @@ class RegistrationView(CreateView):
         user = authenticate(self.request, username=username, password=password)
 
         if user is not None:
-            node = self.min_user_quantity_domain()
+            node = NodeModel.objects.order_by('user_quantity').first()
             node_domain = node.node_domain
             node.user_quantity += 1
             node.save()
@@ -134,20 +134,6 @@ class RegistrationView(CreateView):
                 print('All tokens is expired')
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-
-    def min_user_quantity_domain(self):
-        min_user_quantity = float("inf")
-        min_user_quantity_node = None
-
-        for node in NodeModel.objects.all():
-            user_quantity = node.user_quantity
-            if user_quantity < min_user_quantity:
-                min_user_quantity = user_quantity
-                min_user_quantity_node = node
-        return min_user_quantity_node
-
-
-# ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
 def UserLogin(request):

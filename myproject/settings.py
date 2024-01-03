@@ -186,6 +186,7 @@ LOGGING = {
 # SITE_DOMAIN = os.environ.get("domain")
 
 MY_VARIABLES = {
-     "SITE_DOMAIN": "192.168.0.98",
+    #"SITE_DOMAIN": "192.168.0.98",
     #"SITE_DOMAIN": "176.197.34.213",
+    "GREETINGS": "HELLO FRIEND"
 }

@@ -13,18 +13,16 @@
       <div class="star"></div>
     </div>
       <div class="form-div">
-<!--       <form id="login-form" method="post">
-          {% csrf_token %}
-          <h2>Log In</h2>
-          <input type="username" name="username" placeholder="User Name" required id="username">
-          <input type="password" name="password" placeholder="Password" required id="login-password">
-          <button type="submit" class="create">Log In</button>
-       </form>
-      -->
-      <form id="login-form" method="post">
+         <form method="post">
+	    {% csrf_token %}
+	    <input type="text" name="username" placeholder="Username">
+	    <input type="password" name="password" placeholder="Password">
+	    <button type="submit">Log In</button>
+	 </form>
+	 <!-- <form id="login-form" method="post">
           {% csrf_token %}
           {{ form.as_p }}
-          <button type="submit">Login</button>
+	  <button type="submit">Login</button> -->
       </form>
       </div>
       </div>

@@ -150,24 +150,15 @@ class RegistrationView(CreateView):
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
-
-#@login_required
 def UserLogin(request):
-   if request.method == "POST":
-       form = AuthenticationForm(data=request.POST)
-       if form.is_valid():
-           username = form.cleaned_data.get('username')
-           password = form.cleaned_data.get('password')
-           user = authenticate(username=username, password=password)
-           if user is not None:
-               login(request, user)
-               return redirect('MainApp:profile')
-           else:
-               form.add_error(None, 'Invalid username or password')
-   else:
-       form = AuthenticationForm()
-   return render(request, 'registration/login.html', {'form': form})
-
+   if request.method == 'POST':
+       username = request.POST['username']
+       password = request.POST['password']
+       user = authenticate(request, username=username, password=password)
+       if user is not None:
+           login(request, user)
+           return redirect('MainApp:profile')
+   return render(request, 'registration/login.html')
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===

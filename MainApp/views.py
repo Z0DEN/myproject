@@ -30,6 +30,8 @@ global status_list
 
 def CheckUsername(request):
     username = request.GET.get('username')
+    if username == '':
+        return JsonResponse({'is_taken': False})
     result = CloudUser.objects.filter(username=username).exists()
     return JsonResponse({'is_taken': result})
   

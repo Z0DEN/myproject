@@ -1,30 +1,32 @@
-var timeoutId = null;
-var minLength = 3;
+var delay = 500;
+var timer = null
+const img_checkbox = document.getElementById('checkbox').style;
+const img_cross = document.getElementById('cross').style;
 
-$('#id_username').on('input', function(){
+$('#id_username').on('input', function() {
  var username = $(this).val();
 
- if (timeoutId !== null) {
-   clearTimeout(timeoutId);
+ img_checkbox.animation = '1'
+ img_cross.animation = '1'
+ clearTimeout(timer);
+ if (username.trim() === ""){
+   img_cross.animation = 'appearance 3000ms ease-in-out forwards';
+   return;
  }
-
- if (username.length >= minLength) {
-   timeoutId = setTimeout(function() {
-     $.ajax({
-       url: '/CheckUsername/',
-       data: {
-         'username': username
-       },
-       success: function(data){
-         if (data.is_taken){
-		 console.log('username is taken')
-         }
-	 else {
-		 console.log('username is free')
-	 }
+ timer = setTimeout(function() {
+   $.ajax({
+     url: '/CheckUsername/',
+     data: {
+       'username': username
+     },
+     success: function(data) {
+       if (data.is_taken) {
+    	  img_cross.animation = 'appearance 3000ms ease-in-out forwards';
        }
-     });
-   }, 500);
- }
+       else {
+    	  img_checkbox.animation = 'appearance 3000ms ease-in-out forwards';
+       }
+     }
+   });
+ }, delay);
 });
-

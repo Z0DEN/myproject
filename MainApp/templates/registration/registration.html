@@ -11,15 +11,14 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+    <span>
+       <img src="https://cdn-icons-png.flaticon.com/512/5290/5290058.png" alt="" id="checkbox">
+    </span>
+    <span>
+       <img src="https://secretfit-food.ru/wp-content/uploads/2019/10/close.png" alt="" id="cross">
+    </span>
     <button type="submit">Register</button>
   </form>
-	{% if form.errors %}
-	   <ul>
-	   {% for error in form.non_field_errors %}
-	       <li>{{ error }}</li>
-	   {% endfor %}
-	   </ul>
-	{% endif %}
 </body>
 </html>
 

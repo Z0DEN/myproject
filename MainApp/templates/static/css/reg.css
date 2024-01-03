@@ -258,3 +258,52 @@ button:hover {
 .close-panel:hover {
 	color: #000000;
 }
+
+
+#checkbox{
+  position:absolute;
+  width: 100px;
+  height: 100px;
+  opacity: 0%;
+  margin-bottom: 25px;
+  margin-left: 315px;
+}
+
+#cross{
+  position: absolute;
+  width: 75px;
+  height: 75px;
+  opacity: 0%;
+  margin-bottom: 15px;
+  margin-left: 330px;
+}
+
+@keyframes appearance {
+  0% {
+    opacity: 20%;
+  }
+  10% {
+    opacity: 50%;
+  }
+  20% {
+    opacity: 100%;
+  }
+  100% {
+    opacity: 100%;
+  }
+}
+
+@keyframes leaving {
+  1% {
+    opacity: 100%;
+  }
+  10% {
+    opacity: 100%;
+  }
+  20% {
+    opacity: 50%;
+  }
+  100% {
+    opacity: 20%;
+  }
+}

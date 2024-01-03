@@ -152,8 +152,8 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_URL = "/accounts/login"
-LOGOUT_URL = "/accounts/logout/"
+LOGIN_URL = "/login/"
+LOGOUT_URL = "/logout/"
 LOGIN_REDIRECT_URL = reverse_lazy("MainApp:profile")
 AUTH_USER_MODEL = "MainApp.CloudUser"
 
@@ -186,6 +186,6 @@ LOGGING = {
 # SITE_DOMAIN = os.environ.get("domain")
 
 MY_VARIABLES = {
-    # "SITE_DOMAIN": "192.168.0.98",
-    "SITE_DOMAIN": "176.197.34.213",
+     "SITE_DOMAIN": "192.168.0.98",
+    #"SITE_DOMAIN": "176.197.34.213",
 }

@@ -1,15 +1,16 @@
 from django.urls import path
 from . import views
-from .views import RegistrationView, LoginView
 
 app_name = 'MainApp'
 
 urlpatterns = [
-    path('', views.home_render, name="home"),
-    path('profile/', views.profile_render, name="profile"),
-    path('reg/', RegistrationView.as_view(), name='register'),
+    path('', views.HomeRender, name="home"),
+    path('profile/', views.ProfileRender, name="profile"),
+    path('reg/', views.RegistrationView.as_view(), name='register'),
+    path('logout/', views.UserLogout, name="logout"),
+    path('login/', views.UserLogin, name="login"),
     path('NodeConnection/', views.NodeConnection),
-    path('GetToken/', views.GetToken, name="GetToken"),
-    path('token_verify/', views.token_verify, name="token_verify"),
+    path('GetToken/', views.GetToken),
+    path('TokenVerify/', views.TokenVerify),
 ]
 

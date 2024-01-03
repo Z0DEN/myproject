@@ -5,7 +5,8 @@ import secrets
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -149,26 +150,24 @@ class RegistrationView(CreateView):
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
-class LoginView(View):
-    form_class = CloudUserLoginForm
-    template_name = "login.html"
 
-    def get(self, request):
-        form = self.form_class()
-        return render(request, self.template_name, {"form": form})
+#@login_required
+def UserLogin(request):
+   if request.method == "POST":
+       form = AuthenticationForm(data=request.POST)
+       if form.is_valid():
+           username = form.cleaned_data.get('username')
+           password = form.cleaned_data.get('password')
+           user = authenticate(username=username, password=password)
+           if user is not None:
+               login(request, user)
+               return redirect('MainApp:profile')
+           else:
+               form.add_error(None, 'Invalid username or password')
+   else:
+       form = AuthenticationForm()
+   return render(request, 'registration/login.html', {'form': form})
 
-    def post(self, request):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password1")
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect("MainApp:home")
-            else:
-                form.add_error(None, "Invalid credentials")
-        return render(request, self.template_name, {"form": form})
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
@@ -361,7 +360,7 @@ def GetToken(request):
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
-def token_verify(request):
+def TokenVerify(request):
     token = request.headers.get("Authorization")
     if token:
         token_type, token = token.split(" ")
@@ -419,7 +418,7 @@ def user_token_update(data):
 
 
 @csrf_protect
-def home_render(request):
+def HomeRender(request):
     return render(request, "main/home.html")
 
 
@@ -427,11 +426,19 @@ def home_render(request):
 
 
 @login_required
-def profile_render(request):
+def ProfileRender(request):
     MY_VARIABLES = settings.MY_VARIABLES
     context = MY_VARIABLES
     return render(request, "registration/profile.html", context)
 
+
+# ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
+
+
+@login_required
+def UserLogout(request):
+    logout(request)
+    return redirect("MainApp:profile")
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 

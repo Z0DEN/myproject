@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from MainApp.models import NodeModel, ServerDataModel
 
+from .tokens import *
 
 def get_token_for_node(UUID):
     secret_key = secrets.token_hex(32)
@@ -36,8 +37,26 @@ def TokenVerify(request):
     print('token verify')
 
 
-def UpdateNodeTokens():
+def UpdateNodeTokens(node):
     print('updating tokens')
+    new_local_access_token, new_local_refresh_token, new_secret_key = get_token_for_node(node.UUID)
+    
+    if node.local_connection:
+        url = f"http://{node.IN_IP}:8002/{func}/"
+    else:
+        url = f"http://{node.EX_IP}:8002/{func}/"
+    headers = {
+        'Authorization': 'server ' + refresh_token
+    }
+
+    try:
+        response = requests.post(url, data=data, headers=headers)
+        status = response.json().get('status')
+    except Exception as e:
+        pass
+
+#    node.local_server_access_token = new_local_access_token
+#    node.local_server_refresh_token = new_local_refresh_token
 
 
 def SendData(data):
@@ -53,15 +72,16 @@ def SendData(data):
     headers = {
         'Authorization': 'server ' + access_token
     }
+    status = None
 
     try:
         response = requests.post(url, data=data, headers=headers)
         status = response.json().get('status')
-    except exception as e:
+    except Exception as e:
         pass
 
     if status != 21:
-        UpdateNodeTokens()
+        UpdateNodeTokens(node)
 #        SendData(data)
         headers['Authorization'] = 'server ' + refresh_token
         response = requests.post(url, data=data, headers=headers)
@@ -129,7 +149,6 @@ def NodeConnection(request):
         obj = NodeModel.objects.filter(UUID=data["UUID"])
         if obj.exists():
             new_local_access_token, new_local_refresh_token, status = ChangeNodeData(data, token_type, token)
-            print('we get new local tokens')
             return new_local_access_token, new_local_refresh_token, status
         else:
             status = IsNodeExist(data)
@@ -142,7 +161,6 @@ def NodeConnection(request):
             return None, None, 15
 
         local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data['UUID'])
-        print('gettin new data')
 
         data["user_quantity"] = 0
         data["local_server_access_token"] = local_server_access_token
@@ -175,8 +193,6 @@ def NodeConnection(request):
     bearer_header = request.headers.get('Authorization')
     token_type = bearer_header.split(' ')[0]
     bearer_token = bearer_header.split(' ')[1]
-    print(token_type, '  ', bearer_token)
-    print('data', data)
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 

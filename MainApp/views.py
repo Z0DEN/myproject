@@ -5,9 +5,10 @@ import secrets
 from django.core.cache import cache
 from datetime import datetime, timedelta
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views import View
@@ -16,7 +17,7 @@ from django.views.generic import CreateView
 
 from MainApp.models import CloudUser, NodeModel
 
-from .forms import CloudUserAuthForm, RegisterForm 
+from .forms import CloudUserAuthForm, RegisterForm, LoginForm
 from .node import SendData
 from .tokens import *
 
@@ -96,42 +97,56 @@ def Registration(request):
                user.save()
                login(request, user)
 
+               access_token, refresh_token = GetToken(user)
+               response = HttpResponseRedirect(reverse('MainApp:profile'))
+               response.set_cookie('access_token', access_token, httponly=True)
+               response.set_cookie('refresh_token', refresh_token, httponly=True)
+
                data_to_send = {
                   'username': user.username,
                   'node_UUID': node.UUID,
                   'func': 'AddUser',
                }
                SendData(data_to_send)
-               access_token, refresh_token = GetToken(user)
-               response = HttpResponseRedirect(reverse('MainApp:profile'))
-               response.set_cookie('access_token', access_token, httponly=True)
-               response.set_cookie('refresh_token', refresh_token, httponly=True)
                return response
 
 
 def UserLogin(request):
-    if request.method != 'POST':
-        return render(request, 'registration/login.html')
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
+    form = LoginForm(request.POST or None)
+    context = {
+       'STATUS': True,
+       'form': form
+    }
+    if request.method == 'GET':
+        return render(request, 'registration/login.html', context)
+    if form.is_valid():
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
         login(request, user)
         access_token, refresh_token = GetToken(user)
         response = HttpResponseRedirect(reverse('MainApp:profile'))
         response.set_cookie('access_token', access_token, httponly=True)
         response.set_cookie('refresh_token', refresh_token, httponly=True)
         return response
+    else:
+        context['STATUS'] = False
+        context['ERROR'] = 'User does not exist'
+    return render(request, 'registration/login.html', context)
 
 
 @login_required
 def UserLogout(request):
+    user = CloudUser.objects.get(username=request.user)
+    user.user_access_token = 'user_access_token'
+    user.user_refresh_token = 'user_refresh_token'
+    user.secret_key = 'secret_key'
+    user.save()
     logout(request)
     response = HttpResponseRedirect(reverse('MainApp:profile'))
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     return response
-    #return redirect("MainApp:profile")
 
 
 def UserTokenUpdate(data):

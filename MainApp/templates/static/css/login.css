@@ -119,46 +119,6 @@ border-radius: 10px;
 border: 1px solid rgba( 255, 255, 255, 0.18 );
 }
 
-form.disabled {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.form-switch{
-  display: flex;
-  width: 100%;
-  max-width: 450px;
-  height: 6vh;
-  gap: 5vw;
-  padding-bottom: 15px;
-}
-
-.form-div{
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: start;
-  justify-content: center;
-}
-
-.form-switch .disabled{
-  color: white;
-  border-radius: 10px;
-  border: 1px solid #63e2b7;
-  background-color: transparent;
-  box-shadow:
-  0px 0px 14px #63e2b7,
-  0px 0px 11px #63e2b7,
-  0px 0px 7.8px #63e2b7,
-  0px 0px 20px #63e2b7,
-  inset 0px 0px 104.2px -44px #63e2b877,
-  inset 0px 0px 112.9px -44px #63e2b87a,
-  inset 0px 0px 108.1px -44px #63e2b880,
-  inset 0px 0px 98.9px -44px #63e2b886,
-  inset 0px 0px 92px -44px #63e2b873,
-  inset 0px 0px 127px -44px #63e2b860;
-}
-
 button:hover {
 	background-color: #20b45ea9;
 }
@@ -176,82 +136,14 @@ button:hover {
   align-items: center;
 }
 
-.confirmation-panel {
-	width: max-content;
-  position: relative;
-  background-color: rgba(46, 204, 113, 0.8);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  animation: fade-in 0.5s;
-  backdrop-filter: blur(10px);
-  display: flex;
-	flex-direction: column;
-  justify-content: center;
-  align-items: center;
-	font-size: 150%;
-}
-
-.close-panel {
-	margin: 2vh 0 0 0;
-	width: 100%;
-  position: relative;
-	font-size: 100%;
+.errorlist.nonfield {
+  color: pink;
   font-weight: bold;
-  color: #e0e0e0;
-  background-color: transparent;
-  border: 1px solid;
-  cursor: pointer;
-  transition: color 0.2s;
+  padding: 10px;
+  padding-top: 0px;
 }
 
-.close-panel:hover {
-	color: #000000;
-}
-
-
-#checkbox{
-  position:absolute;
-  width: 50px;
-  height: 50px;
-  opacity: 0%;
-  margin-left: 315px;
-}
-
-#cross{
-  position: absolute;
-  width: 35px;
-  height: 35px;
-  opacity: 0%;
-  margin-left: 330px;
-}
-
-@keyframes appearance {
-  0% {
-    opacity: 20%;
-  }
-  10% {
-    opacity: 50%;
-  }
-  20% {
-    opacity: 100%;
-  }
-  100% {
-    opacity: 100%;
-  }
-}
-
-@keyframes leaving {
-  1% {
-    opacity: 100%;
-  }
-  10% {
-    opacity: 100%;
-  }
-  20% {
-    opacity: 50%;
-  }
-  100% {
-    opacity: 20%;
-  }
+.reg-link {
+  position: relative;
+  color: white;
 }

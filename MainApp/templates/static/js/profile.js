@@ -1,5 +1,4 @@
 function logout(){
-  localStorage.removeItem('access_key');
-  localStorage.removeItem('refresh_key');
+  localStorage.removeItem('access_token');
   window.location.href = "/logout/";
 }

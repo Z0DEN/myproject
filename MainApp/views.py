@@ -125,8 +125,10 @@ def UserLogin(request):
         user = authenticate(username=username, password=password)
         login(request, user)
         access_token, refresh_token = GetToken(user)
-        response = HttpResponseRedirect(reverse('MainApp:profile'))
-        response.set_cookie('access_token', access_token, httponly=True)
+        response = JsonResponse({
+            'access_token': access_token,
+            'status': 24,
+        })
         response.set_cookie('refresh_token', refresh_token, httponly=True)
         return response
     else:
@@ -144,7 +146,6 @@ def UserLogout(request):
     user.save()
     logout(request)
     response = HttpResponseRedirect(reverse('MainApp:profile'))
-    response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     return response
 
@@ -195,6 +196,7 @@ status_list = {
     21: "Node or user was successfully created. ",
     22: "Token is Valid. ",
     23: "Data successfully changed. ",
+    24: "User logged in successfully. ",
     # ------------------------------------------------------------- #
     30: "Undefined warning. ",
     # ------------------------------------------------------------- #

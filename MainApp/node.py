@@ -42,21 +42,34 @@ def UpdateNodeTokens(node):
     new_local_access_token, new_local_refresh_token, new_secret_key = get_token_for_node(node.UUID)
     
     if node.local_connection:
-        url = f"http://{node.IN_IP}:8002/{func}/"
+        url = f"http://{node.IN_IP}:8002/UpdateNodeTokens/"
     else:
-        url = f"http://{node.EX_IP}:8002/{func}/"
+        url = f"http://{node.EX_IP}:8002/UpdateNodeTokens/"
+
     headers = {
-        'Authorization': 'server ' + refresh_token
+        'Authorization': 'server ' + node.node_refresh_token
+    }
+    data = {
+        'UUID' = node.UUID,
+        'access_token' = new_local_access_token,
+        'refresh_token' = new_local_refresh_token,
     }
 
     try:
         response = requests.post(url, data=data, headers=headers)
-        status = response.json().get('status')
+        response_data = response.json()
+        status = response_data.get('status')
     except Exception as e:
-        pass
+        return 10
 
-#    node.local_server_access_token = new_local_access_token
-#    node.local_server_refresh_token = new_local_refresh_token
+    return status if status != 23
+
+    node.local_server_access_token = new_local_access_token
+    node.local_server_refresh_token = new_local_refresh_token
+    node.secret_key = new_secret_key
+    node.node_access_token = response_data.get('access_token')
+    node.node_refresh_token = response_data.get('refresh_token')
+    node.save()
 
 
 def SendData(data):
@@ -81,13 +94,9 @@ def SendData(data):
         pass
 
     if status != 21:
-        UpdateNodeTokens(node)
-#        SendData(data)
-        headers['Authorization'] = 'server ' + refresh_token
-        response = requests.post(url, data=data, headers=headers)
-        status = response.json().get('status')
-        if status != 21:
-            print('All tokens is expired')
+        status = UpdateNodeTokens(node)
+        if status == 23:
+            SendData(data)
 
 
 @csrf_exempt

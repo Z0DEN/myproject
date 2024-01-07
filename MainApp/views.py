@@ -25,12 +25,11 @@ from .node import SendData
 from .tokens import *
 
 
-
-
-
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
-global status_list
+global STATUS_LIST, REDISKA
+
+REDISKA = redis.Redis(host='localhost', port=6379, password='redisisme', db=0)
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
@@ -69,46 +68,45 @@ def GetToken(user):
     access_token = generate_token(access_payload, secret_key)
     refresh_token = generate_token(refresh_payload, secret_key)
 
-    r = redis.Redis(host='localhost', port=6379, db=0)
-    r = get_redis_connection('default')
+    #r = get_redis_connection('default')
 
-    r.setex(f"access_token:{user.username}", 600, access_token)
-    r.setex(f"refresh_token:{user.username}", 1800, refresh_token)
-    r.setex(f"secret_key:{user.username}", 1800, secret_key)
+    #r.setex(f"access_token:{user.username}", 600, access_token)
+    #r.setex(f"refresh_token:{user.username}", 1800, refresh_token)
+    REDISKA.setex(f"user_secret_key:{user.username}", 1800, secret_key)
 
     return access_token, refresh_token
 
 
-def GetToken(user):
-    secret_key = secrets.token_hex(32)
-    scopes = ["read", "write"]
-    issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=100)
-    refresh_expiration = issued_at + timedelta(hours=1)
-    user_model = CloudUser.objects.get(username=user.username)
-
-    refresh_payload = {
-        "sub": user.username,
-        "exp": refresh_expiration,
-        "iat": issued_at,
-        "scopes": scopes,
-    }
-
-    access_payload = {
-        "sub": user.username,
-        "exp": access_expiration,
-        "iat": issued_at,
-        "scopes": scopes,
-    }
-
-    access_token = generate_token(access_payload, secret_key)
-    refresh_token = generate_token(refresh_payload, secret_key)
-
-    user.user_access_token=access_token
-    user.user_refresh_token=refresh_token
-    user.secret_key=secret_key
-    user.save()
-    return access_token, refresh_token
+#def GetToken(user):
+#    secret_key = secrets.token_hex(32)
+#    scopes = ["read", "write"]
+#    issued_at = datetime.utcnow()
+#    access_expiration = issued_at + timedelta(minutes=100)
+#    refresh_expiration = issued_at + timedelta(hours=1)
+#    user_model = CloudUser.objects.get(username=user.username)
+#
+#    refresh_payload = {
+#        "sub": user.username,
+#        "exp": refresh_expiration,
+#        "iat": issued_at,
+#        "scopes": scopes,
+#    }
+#
+#    access_payload = {
+#        "sub": user.username,
+#        "exp": access_expiration,
+#        "iat": issued_at,
+#        "scopes": scopes,
+#    }
+#
+#    access_token = generate_token(access_payload, secret_key)
+#    refresh_token = generate_token(refresh_payload, secret_key)
+#
+#    user.user_access_token=access_token
+#    user.user_refresh_token=refresh_token
+#    user.secret_key=secret_key
+#    user.save()
+#    return access_token, refresh_token
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
@@ -181,11 +179,7 @@ def UserLogin(request):
 
 @login_required
 def UserLogout(request):
-    user = CloudUser.objects.get(username=request.user)
-    user.user_access_token = 'user_access_token'
-    user.user_refresh_token = 'user_refresh_token'
-    user.secret_key = 'secret_key'
-    user.save()
+    REDISKA.delete(f'user_secret_key:{request.user}')
     logout(request)
     response = HttpResponseRedirect(reverse('MainApp:profile'))
     response.delete_cookie('refresh_token')
@@ -224,7 +218,7 @@ def ProfileRender(request):
 #   3<..>  -> Warning
 #   4<..>  -> Info
 
-status_list = {
+STATUS_LIST = {
     10: "Undefined error. ",
     11: "Node already exists. ",
     12: "Invalid request method. ",

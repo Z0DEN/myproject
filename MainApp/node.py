@@ -50,9 +50,9 @@ def UpdateNodeTokens(node):
         'Authorization': 'server ' + node.node_refresh_token
     }
     data = {
-        'UUID' = node.UUID,
-        'access_token' = new_local_access_token,
-        'refresh_token' = new_local_refresh_token,
+        'UUID': node.UUID,
+        'access_token': new_local_access_token,
+        'refresh_token': new_local_refresh_token,
     }
 
     try:
@@ -62,7 +62,8 @@ def UpdateNodeTokens(node):
     except Exception as e:
         return 10
 
-    return status if status != 23
+    if status != 23:
+        return status
 
     node.local_server_access_token = new_local_access_token
     node.local_server_refresh_token = new_local_refresh_token

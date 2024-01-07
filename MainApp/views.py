@@ -2,6 +2,9 @@ import jwt
 import requests
 import json
 import secrets
+import redis
+import time
+from django_redis import get_redis_connection
 from django.core.cache import cache
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -22,6 +25,9 @@ from .node import SendData
 from .tokens import *
 
 
+
+
+
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 global status_list
@@ -36,6 +42,42 @@ def CheckUsername(request):
     result = CloudUser.objects.filter(username=username).exists()
     return JsonResponse({'is_taken': result})
   
+
+
+def GetToken(user):
+    secret_key = secrets.token_hex(32)
+    scopes = ["read", "write"]
+    issued_at = datetime.utcnow()
+    access_expiration = issued_at + timedelta(minutes=10)
+    refresh_expiration = issued_at + timedelta(minutes=30)
+    user_model = CloudUser.objects.get(username=user.username)
+
+    refresh_payload = {
+        "sub": user.username,
+        "exp": int(refresh_expiration.timestamp()),
+        "iat": int(issued_at.timestamp()),
+        "scopes": scopes,
+    }
+
+    access_payload = {
+        "sub": user.username,
+        "exp": int(access_expiration.timestamp()),
+        "iat": int(issued_at.timestamp()),
+        "scopes": scopes,
+    }
+
+    access_token = generate_token(access_payload, secret_key)
+    refresh_token = generate_token(refresh_payload, secret_key)
+
+    r = redis.Redis(host='localhost', port=6379, db=0)
+    r = get_redis_connection('default')
+
+    r.setex(f"access_token:{user.username}", 600, access_token)
+    r.setex(f"refresh_token:{user.username}", 1800, refresh_token)
+    r.setex(f"secret_key:{user.username}", 1800, secret_key)
+
+    return access_token, refresh_token
+
 
 def GetToken(user):
     secret_key = secrets.token_hex(32)

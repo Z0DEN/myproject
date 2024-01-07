@@ -68,10 +68,6 @@ def GetToken(user):
     access_token = generate_token(access_payload, secret_key)
     refresh_token = generate_token(refresh_payload, secret_key)
 
-    #r = get_redis_connection('default')
-
-    #r.setex(f"access_token:{user.username}", 600, access_token)
-    #r.setex(f"refresh_token:{user.username}", 1800, refresh_token)
     REDISKA.setex(f"user_secret_key:{user.username}", 1800, secret_key)
 
     return access_token, refresh_token

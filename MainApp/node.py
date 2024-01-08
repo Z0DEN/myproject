@@ -65,8 +65,8 @@ def UpdateNodeTokens(node):
     if status != 23:
         return status
 
-    node.local_server_access_token = new_local_access_token
-    node.local_server_refresh_token = new_local_refresh_token
+#    node.local_server_access_token = new_local_access_token
+#    node.local_server_refresh_token = new_local_refresh_token
     node.secret_key = new_secret_key
     node.node_access_token = response_data.get('access_token')
     node.node_refresh_token = response_data.get('refresh_token')

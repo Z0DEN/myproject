@@ -185,7 +185,7 @@ def NodeConnection(request):
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     if request.method != "POST":
-        response_data["msg"] = status_list[12]
+        response_data["msg"] = STATUS_LIST[12]
         response_data["status"] = 12
         return JsonResponse(response_data)
 
@@ -216,7 +216,7 @@ def NodeConnection(request):
         or node_server_refresh_token is None
         or bearer_token is None
     ):
-        response_data["msg"] = status_list[13]
+        response_data["msg"] = STATUS_LIST[13]
         response_data["status"] = 13
         return JsonResponse(response_data)
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -230,7 +230,8 @@ def NodeConnection(request):
         "refresh_token": response_refresh_token,
     }
     if status != 17:
-        response_data["msg"] = status_list[status]
+        response_data["msg"] = STATUS_LIST[status]
+    print(response_data)
     return JsonResponse(response_data)
 
 
@@ -242,7 +243,7 @@ def NodeConnection(request):
 #   3<..>  -> Warning
 #   4<..>  -> Info
 
-status_list = {
+STATUS_LIST = {
     10: "Undefined error. ",
     11: "Node already exists. ",
     12: "Invalid request method. ",

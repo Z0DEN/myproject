@@ -111,9 +111,12 @@ def NodeConnection(request):
     }
 
     def ChangeNodeData(data, token_type, token):
+        print('start change data:    ', token_type)
         if token_type == 'personal':
             obj = ServerDataModel.objects.first()
+            print('\n', 'token_type = ', token_type, 'token: ', token, '\n')
             local_personal_key = getattr(obj, 'personal_key')
+            print('\n', 'local_personal_token = ', local_personal_key, '\n')
             if token != local_personal_key:
                 return None, None, 15
 
@@ -204,6 +207,8 @@ def NodeConnection(request):
     token_type = bearer_header.split(' ')[0]
     bearer_token = bearer_header.split(' ')[1]
 
+#    print('data', data, '\n', 'token_type: ', token_type, 'token: ', bearer_token)
+
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     if (
@@ -231,7 +236,7 @@ def NodeConnection(request):
     }
     if status != 17:
         response_data["msg"] = STATUS_LIST[status]
-    print(response_data)
+    print('\n', response_data, '\n')
     return JsonResponse(response_data)
 
 

@@ -65,8 +65,6 @@ def UpdateNodeTokens(node):
     if status != 23:
         return status
 
-#    node.local_server_access_token = new_local_access_token
-#    node.local_server_refresh_token = new_local_refresh_token
     node.secret_key = new_secret_key
     node.node_access_token = response_data.get('access_token')
     node.node_refresh_token = response_data.get('refresh_token')
@@ -172,8 +170,6 @@ def NodeConnection(request):
         local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data['UUID'])
 
         data["user_quantity"] = 0
-        data["local_server_access_token"] = local_server_access_token
-        data["local_server_refresh_token"] = local_server_refresh_token
         data["secret_key"] = secret_key
 
         new_node = NodeModel(**data)

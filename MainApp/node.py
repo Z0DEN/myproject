@@ -128,8 +128,6 @@ def NodeConnection(request):
                 return None, None, status
 
         local_server_access_token, local_server_refresh_token, secret_key = get_token_for_node(data['UUID'])
-        data["local_server_access_token"] = local_server_access_token
-        data["local_server_refresh_token"] = local_server_refresh_token
         data["secret_key"] = secret_key
         NodeModel.objects.filter(UUID=data['UUID']).update(**data)
         return local_server_access_token, local_server_refresh_token, 23

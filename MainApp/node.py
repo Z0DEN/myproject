@@ -12,8 +12,8 @@ from .tokens import *
 def get_token_for_node(UUID):
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=1)
-    refresh_expiration = issued_at + timedelta(minutes=5)
+    access_expiration = issued_at + timedelta(minutes=30)
+    refresh_expiration = issued_at + timedelta(days=5)
 
     refresh_payload = {
         "sub": UUID,
@@ -61,6 +61,19 @@ def UpdateNodeTokens(node):
         status = response_data.get('status')
     except Exception as e:
         return 10
+
+    if status == 14:
+        headers = {
+            'Authorization': 'server ' + ServerDataModel.objects.first().personal_key
+        }
+
+        try:
+            response = requests.post(url, data=data, headers=headers)
+            response_data = response.json()
+            status = response_data.get('status')
+        except Exception as e:
+            return 10
+
 
     if status != 23:
         return status
@@ -111,8 +124,7 @@ def NodeConnection(request):
     def ChangeNodeData(data, token_type, token):
         print('start change data:   ', token_type, '  ', token)
         if token_type == 'personal':
-            obj = ServerDataModel.objects.first()
-            local_personal_key = getattr(obj, 'personal_key')
+            local_personal_key = ServerDataModel.objects.first().personal_key
             if token != local_personal_key:
                 return None, None, 15
 

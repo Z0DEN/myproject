@@ -143,6 +143,7 @@ def Registration(request):
                   'node_UUID': node.UUID,
                   'func': 'AddUser',
                }
+               print('send data')
                SendData(data_to_send)
                return response
 
@@ -162,10 +163,10 @@ def UserLogin(request):
         login(request, user)
         access_token, refresh_token = GetToken(user)
         response = JsonResponse({
-            'access_token': access_token,
             'status': 24,
         })
-        response.set_cookie('refresh_token', refresh_token, httponly=True)
+        response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='None', secure=True)
+        response.set_cookie('access_token', access_token, httponly=False, samesite='None', secure=True)
         return response
     else:
         context['STATUS'] = False
@@ -179,6 +180,7 @@ def UserLogout(request):
     logout(request)
     response = HttpResponseRedirect(reverse('MainApp:profile'))
     response.delete_cookie('refresh_token')
+    print('hui')
     return response
 
 

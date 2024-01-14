@@ -12,8 +12,10 @@ from .tokens import *
 def get_token_for_node(UUID):
     secret_key = secrets.token_hex(32)
     issued_at = datetime.utcnow()
-    access_expiration = issued_at + timedelta(minutes=30)
-    refresh_expiration = issued_at + timedelta(days=5)
+    #access_expiration = issued_at + timedelta(minutes=30)
+    #refresh_expiration = issued_at + timedelta(days=5)
+    access_expiration = issued_at + timedelta(minutes=1)
+    refresh_expiration = issued_at + timedelta(minutes=2)
 
     refresh_payload = {
         "sub": UUID,
@@ -42,15 +44,14 @@ def UpdateNodeTokens(node):
     new_local_access_token, new_local_refresh_token, new_secret_key = get_token_for_node(node.UUID)
     
     if node.local_connection:
-        url = f"http://{node.IN_IP}:8002/UpdateNodeTokens/"
+        url = f"http://{node.IN_IP}:8005/UpdateNodeTokens/"
     else:
-        url = f"http://{node.EX_IP}:8002/UpdateNodeTokens/"
+        url = f"http://{node.EX_IP}:8005/UpdateNodeTokens/"
 
     headers = {
         'Authorization': 'server ' + node.node_refresh_token
     }
     data = {
-        'UUID': node.UUID,
         'access_token': new_local_access_token,
         'refresh_token': new_local_refresh_token,
     }
@@ -74,6 +75,7 @@ def UpdateNodeTokens(node):
         except Exception as e:
             return 10
 
+    print(respose_data)
 
     if status != 23:
         return status
@@ -82,18 +84,21 @@ def UpdateNodeTokens(node):
     node.node_access_token = response_data.get('access_token')
     node.node_refresh_token = response_data.get('refresh_token')
     node.save()
+    print('sucksess')
+    return 23
 
 
 def SendData(data):
+    print('send data')
     node_UUID = data.pop('node_UUID')
     func = data['func']
     node = NodeModel.objects.get(UUID=node_UUID)
     access_token = node.node_access_token
     refresh_token = node.node_refresh_token
     if node.local_connection:
-        url = f"http://{node.IN_IP}:8002/{func}/"
+        url = f"http://{node.IN_IP}:8005/{func}/"
     else:
-        url = f"http://{node.EX_IP}:8002/{func}/"
+        url = f"http://{node.EX_IP}:8005/{func}/"
     headers = {
         'Authorization': 'server ' + access_token
     }
@@ -104,11 +109,16 @@ def SendData(data):
         status = response.json().get('status')
     except Exception as e:
         pass
+    print('status 1: ', status)
 
     if status != 21:
+        print('status 2: ', status)
         status = UpdateNodeTokens(node)
         if status == 23:
             SendData(data)
+        else:
+            print('continue')
+            pass
 
 
 @csrf_exempt
@@ -210,8 +220,6 @@ def NodeConnection(request):
     bearer_header = request.headers.get('Authorization')
     token_type = bearer_header.split(' ')[0]
     bearer_token = bearer_header.split(' ')[1]
-
-#    print('data', data, '\n', 'token_type: ', token_type, 'token: ', bearer_token)
 
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 

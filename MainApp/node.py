@@ -49,7 +49,7 @@ def UpdateNodeTokens(node):
         url = f"http://{node.EX_IP}:8005/UpdateNodeTokens/"
 
     headers = {
-        'Authorization': 'server ' + node.node_refresh_token
+        'Authorization': 'server Bearer' + node.node_refresh_token
     }
     data = {
         'access_token': new_local_access_token,
@@ -65,7 +65,7 @@ def UpdateNodeTokens(node):
 
     if status == 14:
         headers = {
-            'Authorization': 'server ' + ServerDataModel.objects.first().personal_key
+            'Authorization': 'server personal' + ServerDataModel.objects.first().personal_key
         }
 
         try:
@@ -75,7 +75,7 @@ def UpdateNodeTokens(node):
         except Exception as e:
             return 10
 
-    print(respose_data)
+    print(response_data)
 
     if status != 23:
         return status
@@ -89,7 +89,7 @@ def UpdateNodeTokens(node):
 
 
 def SendData(data):
-    print('send data')
+    print('start send data')
     node_UUID = data.pop('node_UUID')
     func = data['func']
     node = NodeModel.objects.get(UUID=node_UUID)
@@ -109,15 +109,14 @@ def SendData(data):
         status = response.json().get('status')
     except Exception as e:
         pass
-    print('status 1: ', status)
+    print('status: ', status)
 
-    if status != 21:
-        print('status 2: ', status)
-        status = UpdateNodeTokens(node)
-        if status == 23:
+    if status == 14 or status == 15:
+        upd_status = UpdateNodeTokens(node)
+        if upd_status == 23:
             SendData(data)
         else:
-            print('continue')
+            print('pass')
             pass
 
 

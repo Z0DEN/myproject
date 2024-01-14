@@ -143,13 +143,11 @@ def Registration(request):
                   'node_UUID': node.UUID,
                   'func': 'AddUser',
                }
-               print('send data')
                SendData(data_to_send)
                return response
 
 
 def UserLogin(request):
-    print('user login')
     form = LoginForm(request.POST or None)
     context = {
        'STATUS': True,
@@ -163,9 +161,6 @@ def UserLogin(request):
         user = authenticate(username=username, password=password)
         login(request, user)
         access_token, refresh_token = GetToken(user)
-        #response = JsonResponse({
-        #    'status': 24,
-        #})
         response = redirect('MainApp:profile')
         response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='None', secure=True)
         response.set_cookie('access_token', access_token, httponly=False, samesite='None', secure=True)
@@ -179,10 +174,10 @@ def UserLogin(request):
 
 @login_required
 def UserLogout(request):
-    print('hui')
     REDISKA.delete(f'user_secret_key:{request.user}')
     logout(request)
     response = HttpResponseRedirect(reverse('MainApp:profile'))
+    response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     return response
 
@@ -195,7 +190,6 @@ def UserTokenUpdate(data):
 
 @csrf_protect
 def HomeRender(request):
-    print('home')
     return render(request, "main/home.html")
 
 

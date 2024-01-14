@@ -6,8 +6,7 @@
     <title>Cloud Storage</title>
     <link id="favicon" rel="icon" type="image/x-icon" href="{% static 'images/cloud.jpg' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}"> 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="{% static 'js/login.js' %}" defer="defer"></script>
+<!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
   </head>
   <body>
       <div class="form-div">
@@ -15,7 +14,6 @@
           {% csrf_token %}
           {{ form.as_p }}
 	  <button type="submit">Login</button> 
-
 	  {% if not STATUS %}
 	    <a class="reg-link" href={% url 'MainApp:register' %}>Registration</a>
 	  {% endif %}

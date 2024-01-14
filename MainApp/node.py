@@ -132,7 +132,7 @@ def NodeConnection(request):
     }
 
     def ChangeNodeData(data, token_type, token):
-        print('start change data:   ', token_type, '  ', token)
+        print('changing data:   ', token_type, '  ', token)
         if token_type == 'personal':
             local_personal_key = ServerDataModel.objects.first().personal_key
             if token != local_personal_key:

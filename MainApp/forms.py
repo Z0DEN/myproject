@@ -39,5 +39,5 @@ class LoginForm(forms.Form):
        if username and password:
            user = authenticate(username=username, password=password)
            if not user:
-               raise forms.ValidationError("Пользователь не найден")
+               raise forms.ValidationError("неправильное имя  пользователя или пароль")
        return super().clean()

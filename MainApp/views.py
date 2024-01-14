@@ -149,6 +149,7 @@ def Registration(request):
 
 
 def UserLogin(request):
+    print('user login')
     form = LoginForm(request.POST or None)
     context = {
        'STATUS': True,
@@ -162,25 +163,27 @@ def UserLogin(request):
         user = authenticate(username=username, password=password)
         login(request, user)
         access_token, refresh_token = GetToken(user)
-        response = JsonResponse({
-            'status': 24,
-        })
+        #response = JsonResponse({
+        #    'status': 24,
+        #})
+        response = redirect('MainApp:profile')
         response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='None', secure=True)
         response.set_cookie('access_token', access_token, httponly=False, samesite='None', secure=True)
         return response
     else:
         context['STATUS'] = False
-        context['ERROR'] = 'User does not exist'
+        context['ERROR'] = 'Invalid login or password'
+        context['FORM_ERRORS'] = form.errors
     return render(request, 'registration/login.html', context)
 
 
 @login_required
 def UserLogout(request):
+    print('hui')
     REDISKA.delete(f'user_secret_key:{request.user}')
     logout(request)
     response = HttpResponseRedirect(reverse('MainApp:profile'))
     response.delete_cookie('refresh_token')
-    print('hui')
     return response
 
 
@@ -192,6 +195,7 @@ def UserTokenUpdate(data):
 
 @csrf_protect
 def HomeRender(request):
+    print('home')
     return render(request, "main/home.html")
 
 

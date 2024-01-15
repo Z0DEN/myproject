@@ -49,7 +49,7 @@ def UpdateNodeTokens(node):
         url = f"http://{node.EX_IP}:8005/UpdateNodeTokens/"
 
     headers = {
-        'Authorization': 'server Bearer' + node.node_refresh_token
+        'Authorization': 'server Bearer ' + node.node_refresh_token
     }
     data = {
         'access_token': new_local_access_token,
@@ -65,7 +65,7 @@ def UpdateNodeTokens(node):
 
     if status == 14:
         headers = {
-            'Authorization': 'server personal' + ServerDataModel.objects.first().personal_key
+            'Authorization': 'server personal ' + ServerDataModel.objects.first().personal_key,
         }
 
         try:
@@ -100,7 +100,7 @@ def SendData(data):
     else:
         url = f"http://{node.EX_IP}:8005/{func}/"
     headers = {
-        'Authorization': 'server ' + access_token
+        'Authorization': 'server Bearer ' + access_token
     }
     status = None
 

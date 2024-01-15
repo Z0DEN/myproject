@@ -64,7 +64,6 @@ def UpdateNodeTokens(node):
         return 10
 
     if status == 14:
-        print('adding personal')
         headers = {
             'Authorization': 'server personal ' + ServerDataModel.objects.first().personal_key,
         }
@@ -79,12 +78,10 @@ def UpdateNodeTokens(node):
     if status != 23:
         return status
 
-    print(response_data)
     node.secret_key = new_secret_key
     node.node_access_token = response_data.get('access_token')
     node.node_refresh_token = response_data.get('refresh_token')
     node.save()
-    print('sucksess')
     return 23
 
 
@@ -114,9 +111,7 @@ def SendData(data):
         upd_status = UpdateNodeTokens(node)
         if upd_status == 23:
             SendData(data)
-            print('data to send: ', data)
         else:
-            print('pass')
             pass
 
 

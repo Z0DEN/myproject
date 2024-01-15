@@ -73,38 +73,6 @@ def GetToken(user):
     return access_token, refresh_token
 
 
-#def GetToken(user):
-#    secret_key = secrets.token_hex(32)
-#    scopes = ["read", "write"]
-#    issued_at = datetime.utcnow()
-#    access_expiration = issued_at + timedelta(minutes=100)
-#    refresh_expiration = issued_at + timedelta(hours=1)
-#    user_model = CloudUser.objects.get(username=user.username)
-#
-#    refresh_payload = {
-#        "sub": user.username,
-#        "exp": refresh_expiration,
-#        "iat": issued_at,
-#        "scopes": scopes,
-#    }
-#
-#    access_payload = {
-#        "sub": user.username,
-#        "exp": access_expiration,
-#        "iat": issued_at,
-#        "scopes": scopes,
-#    }
-#
-#    access_token = generate_token(access_payload, secret_key)
-#    refresh_token = generate_token(refresh_payload, secret_key)
-#
-#    user.user_access_token=access_token
-#    user.user_refresh_token=refresh_token
-#    user.secret_key=secret_key
-#    user.save()
-#    return access_token, refresh_token
-
-
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 

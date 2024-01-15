@@ -57,29 +57,29 @@ def UpdateNodeTokens(node):
     }
 
     try:
-        response = requests.post(url, data=data, headers=headers)
+        response = requests.post(url, data=json.dumps(data), headers=headers)
         response_data = response.json()
         status = response_data.get('status')
     except Exception as e:
         return 10
 
     if status == 14:
+        print('adding personal')
         headers = {
             'Authorization': 'server personal ' + ServerDataModel.objects.first().personal_key,
         }
 
         try:
-            response = requests.post(url, data=data, headers=headers)
+            response = requests.post(url, data=json.dumps(data), headers=headers)
             response_data = response.json()
             status = response_data.get('status')
         except Exception as e:
             return 10
 
-    print(response_data)
-
     if status != 23:
         return status
 
+    print(response_data)
     node.secret_key = new_secret_key
     node.node_access_token = response_data.get('access_token')
     node.node_refresh_token = response_data.get('refresh_token')
@@ -90,7 +90,7 @@ def UpdateNodeTokens(node):
 
 def SendData(data):
     print('start send data')
-    node_UUID = data.pop('node_UUID')
+    node_UUID = data['node_UUID']
     func = data['func']
     node = NodeModel.objects.get(UUID=node_UUID)
     access_token = node.node_access_token
@@ -105,16 +105,16 @@ def SendData(data):
     status = None
 
     try:
-        response = requests.post(url, data=data, headers=headers)
+        response = requests.post(url, data=json.dumps(data), headers=headers)
         status = response.json().get('status')
     except Exception as e:
         pass
-    print('status: ', status)
 
     if status == 14 or status == 15:
         upd_status = UpdateNodeTokens(node)
         if upd_status == 23:
             SendData(data)
+            print('data to send: ', data)
         else:
             print('pass')
             pass
@@ -209,13 +209,13 @@ def NodeConnection(request):
 
     data = json.loads(request.body)
 
-    node_domain = data["node_domain"]
-    IN_IP = data["IN_IP"]
-    EX_IP = data["EX_IP"]
-    UUID = data["UUID"]
-    local_connection = data["local_connection"]
-    node_server_access_token = data["node_access_token"]
-    node_server_refresh_token = data["node_refresh_token"]
+    node_domain = data.get("node_domain")
+    IN_IP = data.get("IN_IP")
+    EX_IP = data.get("EX_IP")
+    UUID = data.get("UUID")
+    local_connection = data.get("local_connection")
+    node_server_access_token = data.get("node_access_token")
+    node_server_refresh_token = data.get("node_refresh_token")
     bearer_header = request.headers.get('Authorization')
     token_type = bearer_header.split(' ')[0]
     bearer_token = bearer_header.split(' ')[1]

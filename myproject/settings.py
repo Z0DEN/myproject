@@ -47,6 +47,7 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",  # 1
     "django.contrib.messages.middleware.MessageMiddleware",  # 2
     "django.contrib.auth.middleware.AuthenticationMiddleware",  # 3
@@ -66,13 +68,17 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://cloudblesk.site",
-    "http://localhost",
-]
+#CORS_ALLOWED_ORIGINS = [
+#    "https://192.168.0.81:8002",
+#    "http://192.168.0.81:8002",
+#    "http://localhost",
+#]
+#
+#SECURE_REFERRER_POLICY = 'no-referrer'
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "myproject.urls"
 

@@ -35,8 +35,6 @@ def get_token_for_node(UUID):
     return access_token, refresh_token, secret_key
 
 
-def TokenVerify(request):
-    print('token verify')
 
 
 def UpdateNodeTokens(node):

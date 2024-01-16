@@ -34,6 +34,12 @@ REDISKA = redis.Redis(host='localhost', port=6379, password='redisisme', db=0)
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 
 
+def RJR(response_data={}, status=False, msg=False):
+    response_data['status'] = status if status else "Success, or not success, that is the question"
+    response_data['msg'] = status_list[status] + msg if status and msg else status_list[status] or msg if status or msg else "???UNDEFINED ERROR???"
+    return JsonResponse(response_data)
+
+
 def CheckUsername(request):
     username = request.GET.get('username')
     if username == '':
@@ -41,7 +47,6 @@ def CheckUsername(request):
     result = CloudUser.objects.filter(username=username).exists()
     return JsonResponse({'is_taken': result})
   
-
 
 def GetToken(user):
     secret_key = secrets.token_hex(32)
@@ -71,6 +76,34 @@ def GetToken(user):
     REDISKA.setex(f"user_secret_key:{user.username}", 1800, secret_key)
 
     return access_token, refresh_token
+
+
+def TokenVerify(request):
+    data = json.loads(request.body)
+
+    bearer_header = request.headers.get('Authorization')
+    node_bearer_token = bearer_header.split(' ')[1]
+    node_UUID = data['node_UUID']
+    node_secret_key = NodeModel.objects.get(UUID=node_UUID)
+    _, decode_server_token_status = decode_token(node_bearer_token, node_secret_key)
+    if decode_server_token_status != 22:
+        response_data = {
+            'node_validate_status': decode_server_token_status,
+            'user_validate_status': 10
+        }
+        return RJR(response_data=response_data)
+
+    user_token = data['Bearer']
+    username = data['username']
+    user_secret_key = REDISKA.get(f'user_secret_key:{request.user}')
+
+    _, decode_user_status = decode_token(user_token, user_secret_key) 
+    response_data = {
+        'node_validate_status': decode_server_token_status,
+        'user_validate_status': decode_user_status,
+    }
+    print('token verify')
+    return RJR(response_data=response_data)
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===

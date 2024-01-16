@@ -12,6 +12,6 @@ urlpatterns = [
     path('login/', views.UserLogin, name="login"),
     path('CheckUsername/', views.CheckUsername),
     path('NodeConnection/', node.NodeConnection),
-    path('TokenVerify/', node.TokenVerify),
+    path('TokenVerify/', views.TokenVerify),
 ]
 

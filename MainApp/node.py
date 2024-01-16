@@ -93,9 +93,11 @@ def SendData(data):
     access_token = node.node_access_token
     refresh_token = node.node_refresh_token
     if node.local_connection:
-        url = f"http://{node.IN_IP}:8005/{func}/"
+        url = f"http://{node.IN_IP}:8002/{func}/"
+#        url = f"http://{node.IN_IP}:8005/{func}/"
     else:
-        url = f"http://{node.EX_IP}:8005/{func}/"
+        url = f"http://{node.IN_IP}:8002/{func}/"
+#        url = f"http://{node.EX_IP}:8005/{func}/"
     headers = {
         'Authorization': 'server Bearer ' + access_token
     }

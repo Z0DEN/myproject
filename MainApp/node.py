@@ -44,9 +44,11 @@ def UpdateNodeTokens(node):
     new_local_access_token, new_local_refresh_token, new_secret_key = get_token_for_node(node.UUID)
     
     if node.local_connection:
-        url = f"http://{node.IN_IP}:8005/UpdateNodeTokens/"
+#        url = f"http://{node.IN_IP}:8005/UpdateNodeTokens/"
+        url = f"http://{node.IN_IP}:8002/UpdateNodeTokens/"
     else:
-        url = f"http://{node.EX_IP}:8005/UpdateNodeTokens/"
+#        url = f"http://{node.EX_IP}:8005/UpdateNodeTokens/"
+        url = f"http://{node.IN_IP}:8002/UpdateNodeTokens/"
 
     headers = {
         'Authorization': 'server Bearer ' + node.node_refresh_token

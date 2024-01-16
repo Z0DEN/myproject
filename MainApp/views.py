@@ -77,42 +77,44 @@ def GetToken(user):
 
 
 def Registration(request):
-   if request.method != "POST":
-       form = RegisterForm()
-       return render(request, "registration/registration.html", {"form": form})
-   else:
-       form = RegisterForm(request.POST)
-       if not form.is_valid():
-           return render(request, "registration/registration.html", {"form": form})
-       else:
-           form.save()
-           username = form.cleaned_data["username"]
-           password = form.cleaned_data["password1"]
+    if request.method != "POST":
+        form = RegisterForm()
+        return render(request, "registration/registration.html", {"form": form})
+    else:
+        form = RegisterForm(request.POST)
+        if not form.is_valid():
+            return render(request, "registration/registration.html", {"form": form})
+        else:
+            form.save()
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password1"]
 
-           user = authenticate(request, username=username, password=password)
+            user = authenticate(request, username=username, password=password)
 
-           if user is not None:
-               node = NodeModel.objects.order_by('user_quantity').first()
-               node_domain = node.node_domain
-               node.user_quantity += 1
-               node.save()
+            if user is not None:
+                node = NodeModel.objects.order_by('user_quantity').first()
+                node_domain = node.node_domain
+                     
+                user.node_domain = node_domain
+                user.save()
+                login(request, user)
 
-               user.node_domain = node_domain
-               user.save()
-               login(request, user)
+                num_users = CloudUser.objects.filter(node_domain=node_domain).count()
+                node.user_quantity = num_users
+                node.save()
 
-               access_token, refresh_token = GetToken(user)
-               response = HttpResponseRedirect(reverse('MainApp:profile'))
-               response.set_cookie('access_token', access_token, httponly=True)
-               response.set_cookie('refresh_token', refresh_token, httponly=True)
+                access_token, refresh_token = GetToken(user)
+                response = HttpResponseRedirect(reverse('MainApp:profile'))
+                response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='None', secure=True)
+                response.set_cookie('access_token', access_token, httponly=False, samesite='None', secure=True)
 
-               data_to_send = {
-                  'username': user.username,
-                  'node_UUID': node.UUID,
-                  'func': 'AddUser',
-               }
-               SendData(data_to_send)
-               return response
+                data_to_send = {
+                   'username': user.username,
+                   'node_UUID': node.UUID,
+                   'func': 'AddUser',
+                }
+                SendData(data_to_send)
+                return response
 
 
 def UserLogin(request):

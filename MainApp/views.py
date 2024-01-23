@@ -202,7 +202,7 @@ def HomeRender(request):
 def ProfileRender(request):
     MY_VARIABLES = settings.MY_VARIABLES
     context = MY_VARIABLES
-    node_ip = NodeModel.objects.get(node_domain=request.user.node_domain).IN_IP
+    node_ip = NodeModel.objects.get(node_domain=request.user.node_domain).EX_IP
     context['NODE_IP'] = node_ip
     return render(request, "registration/profile.html", context)
 

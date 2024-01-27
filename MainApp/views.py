@@ -49,6 +49,10 @@ def CheckUsername(request):
   
 
 def GetToken(user):
+    user_secret_key = REDISKA.get(f'user_secret_key:{user.username}')
+    if user_secret_key is not None:
+        return None, None
+
     secret_key = secrets.token_hex(32)
     scopes = ["read", "write"]
     issued_at = datetime.utcnow()
@@ -72,7 +76,9 @@ def GetToken(user):
 
     access_token = generate_token(access_payload, secret_key)
     refresh_token = generate_token(refresh_payload, secret_key)
-
+    user.user_access_token = access_token
+    user.user_refresh_token = refresh_token
+    user.save()
     REDISKA.setex(f"user_secret_key:{user.username}", 1800, secret_key)
 
     return access_token, refresh_token
@@ -163,6 +169,11 @@ def UserLogin(request):
         user = authenticate(username=username, password=password)
         login(request, user)
         access_token, refresh_token = GetToken(user)
+        if access_token is None:
+            access_token = CloudUser.objects.get(username=username).user_access_token
+            refresh_token = CloudUser.objects.get(username=username).user_refresh_token
+        print(access_token)
+        print(refresh_token)
         response = redirect('MainApp:profile')
         response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax', secure=False)
         response.set_cookie('access_token', access_token, httponly=False, samesite='Lax', secure=False)

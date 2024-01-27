@@ -19,6 +19,8 @@ ALLOWED_HOSTS = [
     "192.168.0.98",
     "176.197.34.213",
     "whoole.space",
+    "www.whoole.space",
+    "home.whoole.space",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -26,6 +28,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
     "https://whoole.space",
     "http://whoole.space",
+    "https://www.whoole.space",
+    "http://www.whoole.space",
+    "https://home.whoole.space",
+    "http://home.whoole.space",
     "http://192.168.0.98",
     "http://176.197.34.213",
     "https://192.168.0.98",

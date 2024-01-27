@@ -24,43 +24,11 @@
           <button onclick="logout()">Logout</button>
       </div>
       <div class="TokenButton">
-          <button onclick="test_user_token('test')">test user token</button>
+          <button onclick="get_data_main()">test user token</button>
+	  <script>
+      	    var node_domain = "{{ user.node_domain }}";
+      	    var username = "{{ user.username }}";
+	  </script>
       </div>
-      <script>
-	const access_token = Cookies.get('access_token')
-	let response_data;
-	function test_user_token(func='test') {
-	 fetch(`https://{{ NODE_IP }}:8002/${func}/`, {
-	   method: 'POST',
-	   headers: {
-	     'Content-Type': 'application/json',
-	     'Authorization': `user Bearer ${access_token}`
-	   },
-	   body: JSON.stringify({
-	     username: '{{ user.username }}'
-	   })
-	 })
-	 .then(response => response.json())
-	 .then(data => {
-	   console.log(data);
-	   response_data = data;
-	   console.log(response_data.status);
-	   checkStatus();
-	 })
-	 .catch((error) => {
-	   console.error('Error:', error);
-	 });
-	}
-	
-	function checkStatus() {
-	 if (response_data.status == 14){
-	   window.location.href = "/logout/";
-	 } else if (response_data.status == 31){
-	   test_user_token();
-	 }
-	}
-	
-	test_user_token();
-      </script>
 </body>
 </html>

@@ -4,7 +4,8 @@ from django.db import models
 
 class CloudUser(AbstractUser):
     node_domain = models.CharField(max_length=20)
-#    secret_key = models.CharField(max_length=64, default='secret_key')
+    user_access_token = models.CharField(max_length=256, default="user_access_token")
+    user_refresh_token = models.CharField(max_length=256, default="user_refresh_token")
 
 
 class NodeModel(models.Model):

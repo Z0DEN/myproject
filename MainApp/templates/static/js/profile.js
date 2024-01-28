@@ -1,7 +1,34 @@
-const access_token = Cookies.get('access_token')
+const csrf_cookie = Cookies.get('csrftoken')
+let access_token;
 let response_data;
 
-function get_data_main(func='test') {
+
+function mainFunc(){
+  console.log('start main function')
+}
+
+
+function updateTokens(){
+ console.log('start updating tokens');
+ fetch('https://whoole.space/UserTokenUpdate/', {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+     'X-CSRFToken': csrf_cookie, 
+   },
+ })
+ .then(response => response.json())
+ .then(data => {
+   console.log(data);
+   if data.status != 23{
+      window.location.href = "/logout/";
+   }
+ })
+}
+
+
+function makeRequest(func='test') {
+ access_token = Cookies.get('access_token');
  fetch(`https://${node_domain}.whoole.space:8002/${func}/`, {
    method: 'POST',
    headers: {
@@ -23,15 +50,20 @@ function get_data_main(func='test') {
  });
 }
 
+
 function checkStatus() {
- if (response_data.status == 14 || response_data.status == 15){
-   console.log('logout')
- } else if (response_data.status == 31){
-   get_data_main();
+ status = response_data.status
+ if (status == 14 || status == 15){
+   updateTokens()
+ } else if (status == 31){
+   makeRequest();
+ } else if (status == 22){
+   mainFunc()
  }
 }
 
-get_data_main();
+makeRequest();
+
 
 function logout(){
   window.location.href = "/logout/";

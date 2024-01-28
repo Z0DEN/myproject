@@ -49,10 +49,6 @@ def CheckUsername(request):
   
 
 def GetToken(user):
-    user_secret_key = REDISKA.get(f'user_secret_key:{user.username}')
-    if user_secret_key is not None:
-        return None, None
-
     secret_key = secrets.token_hex(32)
     scopes = ["read", "write"]
     issued_at = datetime.utcnow()
@@ -91,24 +87,57 @@ def TokenVerify(request):
     }
 
     data = json.loads(request.body)
-    bearer_header = request.headers.get('Authorization')
-    node_bearer_token = bearer_header.split(' ')[1]
-    node_UUID = data['node_UUID']
+    node_bearer_token = request.headers.get('Authorization').split(' ')[1]
+    node_UUID = data.get('node_UUID', None)
     node_secret_key = NodeModel.objects.get(UUID=node_UUID).secret_key
+
+    if (node_bearer_token is None
+        or node_UUID is None
+        or node_secret_key is None):
+        return RJR(response_data=response_data, status=22)
+
     _, validate_server_status = decode_token(node_bearer_token, node_secret_key)
     response_data['node_validate_status'] = validate_server_status
+
     if validate_server_status != 22:
         return RJR(response_data=response_data, status=22)
 
     user_token = data['Bearer']
     username = data['username']
     user_secret_key = REDISKA.get(f'user_secret_key:{username}')
+
     if user_secret_key is None:
         return RJR(response_data=response_data, status=22)
 
     _, validate_user_status = decode_token(user_token, user_secret_key) 
     response_data['user_validate_status'] = validate_user_status
     return RJR(response_data=response_data, status=22)
+
+
+@login_required
+def UserTokenUpdate(request):
+    user = request.user
+    user_refresh_token = request.COOKIES.get('refresh_token', None)
+    user_secret_key = REDISKA.get(f'user_secret_key:{user.username}')
+
+    if user_refresh_token is None or user_secret_key is None:
+        return RJR(status=13, msg='You probably should log out')
+
+    _, token_validate_status = decode_token(user_refresh_token, user_secret_key) 
+    if token_validate_status != 22:
+        return RJR(status=token_validate_status)
+
+    new_access_token, new_refresh_token = GetToken(user)
+
+    user.user_access_token = new_access_token
+    user.user_refresh_token = new_refresh_token
+    user.save()
+
+    response = RJR(msg='tokens were successfully updated', status=23) 
+    response.set_cookie('refresh_token', new_refresh_token, httponly=True, samesite='Lax', secure=True)
+    response.set_cookie('access_token', new_access_token, httponly=False, samesite='Lax', secure=True)
+    
+    return response
 
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
@@ -143,8 +172,8 @@ def Registration(request):
 
                 access_token, refresh_token = GetToken(user)
                 response = HttpResponseRedirect(reverse('MainApp:profile'))
-                response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax', secure=False)
-                response.set_cookie('access_token', access_token, httponly=False, samesite='Lax', secure=False)
+                response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax', secure=True)
+                response.set_cookie('access_token', access_token, httponly=False, samesite='Lax', secure=True)
 
                 data_to_send = {
                    'username': user.username,
@@ -168,15 +197,15 @@ def UserLogin(request):
         password = form.cleaned_data.get('password')
         user = authenticate(username=username, password=password)
         login(request, user)
-        access_token, refresh_token = GetToken(user)
-        if access_token is None:
+        user_secret_key = REDISKA.get(f'user_secret_key:{user.username}')
+        if user_secret_key is None:
+            access_token, refresh_token = GetToken(user)
+        else:
             access_token = CloudUser.objects.get(username=username).user_access_token
             refresh_token = CloudUser.objects.get(username=username).user_refresh_token
-        print(access_token)
-        print(refresh_token)
         response = redirect('MainApp:profile')
-        response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax', secure=False)
-        response.set_cookie('access_token', access_token, httponly=False, samesite='Lax', secure=False)
+        response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax', secure=True)
+        response.set_cookie('access_token', access_token, httponly=False, samesite='Lax', secure=True)
         return response
     else:
         context['STATUS'] = False
@@ -194,9 +223,6 @@ def UserLogout(request):
     response.delete_cookie('refresh_token')
     return response
 
-
-def UserTokenUpdate(data):
-    print('user token update')
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 

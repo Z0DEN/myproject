@@ -232,6 +232,7 @@ def NodeConnection(request):
         response_data["msg"] = STATUS_LIST[13]
         response_data["status"] = 13
         return JsonResponse(response_data)
+
     # +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
     response_access_token, response_refresh_token, status = CreateNewNode(data, token_type, bearer_token)

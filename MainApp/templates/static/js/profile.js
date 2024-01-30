@@ -27,7 +27,19 @@ function updateTokens(){
 }
 
 
-function makeRequest(func='test') {
+function getUserData(){
+ console.log('start gettin data')
+ body = {
+   test: 'test'
+ }
+ makeRequest('GetUserData', body)
+  .then(function(resp_data) {
+    console.log('response data: ', resp_data)
+  })
+}
+
+
+function makeRequest(func='test', body={}) {
  access_token = Cookies.get('access_token');
  fetch(`https://${node_domain}.whoole.space:8002/${func}/`, {
    method: 'POST',
@@ -37,32 +49,28 @@ function makeRequest(func='test') {
    },
    body: JSON.stringify({
      username: username,
+     ...body,
    })
  })
  .then(response => response.json())
  .then(data => {
    console.log(data);
-   response_data = data;
-   checkStatus();
- })
+
+   status = data.token_validate_status
+   if (status == 22){
+     return data
+   } else if (status == 14 || status == 15){
+     upd_tokens_status = updateTokens()
+     return makeRequest(func, body)
+   } else if (status == 31){
+     return makeRequest(func, body)
+   }
+
+   })
  .catch((error) => {
    console.error('Error:', error);
  });
 }
-
-
-function checkStatus() {
- status = response_data.status
- if (status == 14 || status == 15){
-   updateTokens()
- } else if (status == 31){
-   makeRequest();
- } else if (status == 22){
-   mainFunc()
- }
-}
-
-makeRequest();
 
 
 function logout(){

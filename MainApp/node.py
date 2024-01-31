@@ -93,11 +93,11 @@ def SendData(data):
     access_token = node.node_access_token
     refresh_token = node.node_refresh_token
     if node.local_connection:
+#        url = f"https://{node.node_domain}.whoole.space:8002/{func}/"
         url = f"http://{node.IN_IP}:8002/{func}/"
-#        url = f"http://{node.IN_IP}:8005/{func}/"
     else:
-        url = f"http://{node.IN_IP}:8002/{func}/"
-#        url = f"http://{node.EX_IP}:8005/{func}/"
+#        url = f"https://{node.node_domain}.whoole.space:8002/{func}/"
+        url = f"http://{node.EX_IP}:8002/{func}/"
     headers = {
         'Authorization': 'server Bearer ' + access_token
     }
@@ -106,6 +106,7 @@ def SendData(data):
     try:
         response = requests.post(url, data=json.dumps(data), headers=headers)
         status = response.json().get('status')
+        print(status)
     except Exception as e:
         pass
 

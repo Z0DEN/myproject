@@ -27,6 +27,29 @@ function updateTokens(){
 }
 
 
+function createFile(){
+  let input = document.getElementById("file");
+  
+  input.addEventListener("change", function() {
+    let files = input.files;
+  
+    if (files.length > 0) {
+      console.log("Выбрано файлов: " + files.length);
+  
+      for (let i = 0; i < files.length; i++) {
+        let file = files[i];
+        console.log("Имя: " + file.name);
+        console.log("Размер: " + file.size + " байт");
+        console.log("Тип: " + file.type);
+        console.log("Дата изменения: " + file.lastModifiedDate);
+      }
+    } else {
+      console.log("Файлы не выбраны");
+    }
+  });
+}
+
+
 function getUserData(){
  console.log('start gettin data')
  body = {

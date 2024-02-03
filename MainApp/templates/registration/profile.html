@@ -24,9 +24,11 @@
           <button onclick="logout()">Logout</button>
       </div>
       <div class="TokenButton">
-          <button onclick="makeRequest()">test user token</button>
-          <button onclick="updateTokens()">test update token</button>
-          <button onclick="getUserData()">get data</button>
+          <button onclick="makeRequest('CreateFolder', {'folder_name':'fold1', 'folder_parent':'Root'})">test mkdir</button>
+          <button onclick="updateTokens()">update token</button>
+          <button onclick="getUserData()">test get data</button>
+          <button onclick="createFile()">test create file</button>
+	  <input type="file" id="file" name="file" multiple />
 	  <script>
       	    var node_domain = "{{ user.node_domain }}";
       	    var username = "{{ user.username }}";

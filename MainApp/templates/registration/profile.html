@@ -28,11 +28,17 @@
           <button onclick="updateTokens()">update token</button>
           <button onclick="getUserData()">test get data</button>
           <button onclick="createFile()">test create file</button>
-	  <input type="file" id="file" name="file" multiple />
+  	  <div id="dropzone"></div>
 	  <script>
       	    var node_domain = "{{ user.node_domain }}";
       	    var username = "{{ user.username }}";
 	  </script>
+
+	  <div id="drop-zone">
+       	    <h3>file input</h3>
+	    <input type="file" id="file-input" multiple>
+	  </div>
+
       </div>
 </body>
 </html>

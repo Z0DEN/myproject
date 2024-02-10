@@ -48,10 +48,49 @@ li {
     margin-top: 50px;
 }
 
+#remove-all-files {
+    font-size: 16px;
+    text-align: center;
+    color: pink;
+    background-color: grey;
+    border: 1px solid black;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
 
-#file-input {
-     display: none;
-   }
+#remove-all-files:hover {
+    background-color: pink;
+    color: red;
+}
+
+.file-remove-btn {
+    font-size: 16px;
+    height: 24px;
+    width: 24px;
+    text-align: center;
+    color: pink;
+    background-color: grey;
+    border: 1px solid black;
+    border-radius: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.file-remove-btn:hover {
+    background-color: pink;
+    color: red;
+}
+
+#files-map {
+  display: flex;
+  flex-wrap: nowrap; 
+  overflow-x: scroll;
+}
+
+#files-map li {
+  flex:  0  0 auto;
+  white-space: nowrap;
+}
+
 
 #drop-zone {
   display: flex;

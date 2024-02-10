@@ -4,14 +4,16 @@
 <head>
     <title> Профиль пользователя </title>
     <link id="favicon" rel="icon" type="image/x-icon" href="{% static 'images/favicon2.png' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}"> 
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.0-rc.1/dist/js.cookie.min.js"></script>
-    <script src="{% static 'js/profile.js' %}" defer="defer"></script>
+    <script src="{% static 'js/profile.js' %}" defer="defer"></script> 
+    <script src="https://whoole.space/react-bundle/bundle.js" defer="defer"></script> 
 </head>
 <body>
     <header>
         <h1>Профиль пользователя</h1>
     </header>
+    <div id="root"></div>
     <div class="profile-info">
         <div>
           <h2>Profile</h2>

@@ -1,33 +1,3 @@
-var dropZone = document.getElementById("drop-zone");
-var fileInput = document.getElementById("file-input");
-
-dropZone.addEventListener("dragover", function(e) {
-  e.preventDefault();
-});
-
-dropZone.addEventListener("drop", function(e) {
-  e.preventDefault();
-  var files = e.dataTransfer.files;
-  fileInput.files = files;
-  console.log("Перетащенные файлы:");
-  for (var i = 0; i < files.length; i++) {
-    console.log(files[i].name);
-  }
-});
-
-dropZone.addEventListener("click", function() {
-  fileInput.click();
-});
-
-fileInput.addEventListener("change", function() {
-  var files = fileInput.files;
-  console.log("Выбранные файлы:");
-  for (var i = 0; i < files.length; i++) {
-    console.log(files[i].name);
-  }
-});
-
-
 const csrf_cookie = Cookies.get('csrftoken')
 let access_token;
 let response_data;
@@ -55,26 +25,6 @@ function updateTokens(){
    }
  })
 }
-
-
-//var dropZone = document.getElementById("drop-zone");
-//var fileInput = document.getElementById("file-input");
-//
-//dropZone.addEventListener("click", function() {
-//  fileInput.click();
-//});
-//
-//fileInput.addEventListener("change", function() {
-//  var files = fileInput.files;
-//
-//  if (files.length > 0) {
-//    for (var i = 0; i < files.length; i++) {
-//      var file = files[i];
-//      console.log(file.name + " (" + file.size + " bytes)");
-//    }
-//  }
-//});
-
 
 
 function createFile(){

@@ -25,17 +25,18 @@ function DropZone(){
         )}
       </div>
         <aside>
-          <h4>Files</h4>
           <ul id="files-map">
             {files.map((file, index) => (
               <li key={file.path}>
-                {file.name}
                 <button class="file-remove-btn" onClick={() => removeFile(index)}>x</button>
+                <h5>{file.name}</h5>
               </li>
             ))}
           </ul>
         </aside>
-	<button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
+	  { files.length > 0 &&(
+	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
+	  )}
     </div>
   );
 
@@ -56,8 +57,6 @@ function DropZone(){
   };
 
 };
-
-
 
 
 export default DropZone;

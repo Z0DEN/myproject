@@ -9,19 +9,13 @@
     <script src="{% static 'js/profile.js' %}" defer="defer"></script> 
     <script src="https://whoole.space/react-bundle/bundle.js" defer="defer"></script> 
 </head>
+<script>
+  var node_domain = "{{ user.node_domain }}";
+  var username = "{{ user.username }}";
+</script>
 <body>
-    <header>
-        <h1>Профиль пользователя</h1>
-    </header>
     <div id="root"></div>
     <div class="profile-info">
-        <div>
-          <h2>Profile</h2>
-          <p>Username: {{ user.username }}</p>
-          <p>Email: {{ user.email }}</p>
-          <p>Node domain: {{ user.node_domain }}</p>
-          <p>Site domain: {{ GREETINGS }}</p>
-        </div>
       <div class="LogoutButton">
           <button onclick="logout()">Logout</button>
       </div>
@@ -30,17 +24,10 @@
           <button onclick="updateTokens()">update token</button>
           <button onclick="getUserData()">test get data</button>
           <button onclick="createFile()">test create file</button>
-  	  <div id="dropzone"></div>
-	  <script>
-      	    var node_domain = "{{ user.node_domain }}";
-      	    var username = "{{ user.username }}";
-	  </script>
-
-	  <div id="drop-zone">
-       	    <h3>file input</h3>
-	    <input type="file" id="file-input" multiple>
-	  </div>
-
       </div>
+    <div id="explorer-div">
+      <div id="explorer"></div>
+      <div id="explorer-options"></div>
+    </div>
 </body>
 </html>

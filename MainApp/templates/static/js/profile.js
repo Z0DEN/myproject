@@ -52,7 +52,7 @@ function getUserData(){
 }
 
 
-function makeRequest(func='test', body={}) {
+function makeRequest(func='GetUserData', body={}) {
  access_token = Cookies.get('access_token');
  fetch(`https://${node_domain}.whoole.space:8002/${func}/`, {
    method: 'POST',
@@ -68,7 +68,6 @@ function makeRequest(func='test', body={}) {
  .then(response => response.json())
  .then(data => {
    console.log(data);
-
    status = data.token_validate_status
    if (status == 22){
      return data
@@ -78,7 +77,6 @@ function makeRequest(func='test', body={}) {
    } else if (status == 31){
      return makeRequest(func, body)
    }
-
    })
  .catch((error) => {
    console.error('Error:', error);

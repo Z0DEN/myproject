@@ -2,14 +2,13 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 // import axios from "axios";
 
-
 function DropZone(){
+  const [currdir, setCurrdir] = React.useState('root' || []);
   const [files, setFiles] = React.useState([]);
 
   const onDrop = useCallback(acceptedFiles => {
     console.log(acceptedFiles.map(file => file.name));
     setFiles(acceptedFiles);
-    main()
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
@@ -28,7 +27,7 @@ function DropZone(){
           <ul id="files-map">
             {files.map((file, index) => (
               <li key={file.path}>
-                <button class="file-remove-btn" onClick={() => removeFile(index)}>x</button>
+                <button className="file-remove-btn" onClick={() => removeFile(index)}>x</button>
                 <h5>{file.name}</h5>
               </li>
             ))}
@@ -37,13 +36,23 @@ function DropZone(){
 	  { files.length > 0 &&(
 	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
 	  )}
+     	<div>
+     	   <input
+     	     type="text"
+     	     id="folder-input"
+     	     name="folder"
+     	     placeholder="enter a folder name"
+     	     onKeyDown={event => {
+     	       if (event.key === 'Enter') {
+     	         event.preventDefault();
+     	         createFolder(event.target.value);
+     	       }
+     	     }}
+     	   />
+     	</div>
     </div>
   );
 
-  function main(){
-     window.mainFunc()
-  }
-  
   
   function removeAllFiles(){
     setFiles([]);
@@ -56,7 +65,19 @@ function DropZone(){
     setFiles(newFiles);
   };
 
+
+  function createFolder(name){
+     if (name === ""){
+        alert("folder name must be a non-empty string");
+        return;
+     }
+     let body = {
+	'folder_name': name,
+	'folder_parent': currdir,
+     }
+     window.makeRequest('CreateFolder', body)
+  }
 };
 
 
-export default DropZone;
+export {DropZone};

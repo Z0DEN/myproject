@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}"> 
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.0-rc.1/dist/js.cookie.min.js"></script>
     <script src="{% static 'js/profile.js' %}" defer="defer"></script> 
-    <script src="https://whoole.space/react-bundle/bundle.js" defer="defer"></script> 
+    <script src="https://whoole.space/react/static/js/bundle.js" defer="defer"></script> 
 </head>
 <script>
   var node_domain = "{{ user.node_domain }}";
@@ -20,7 +20,6 @@
           <button onclick="logout()">Logout</button>
       </div>
       <div class="TokenButton">
-          <button onclick="makeRequest('CreateFolder', {'folder_name':'fold1', 'folder_parent':'Root'})">test mkdir</button>
           <button onclick="updateTokens()">update token</button>
           <button onclick="getUserData()">test get data</button>
           <button onclick="createFile()">test create file</button>

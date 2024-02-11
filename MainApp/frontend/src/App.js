@@ -75,7 +75,7 @@ function DropZone(){
 	'folder_name': name,
 	'folder_parent': currdir,
      }
-     window.makeRequest('CreateFolder', body)
+     let data = window.makeRequest('CreateFolder', body)
   }
 };
 

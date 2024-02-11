@@ -23,6 +23,7 @@ function updateTokens(){
    if (data.status != 23){
       window.location.href = "/logout/";
    }
+   return data.status
  })
 }
 
@@ -68,12 +69,14 @@ function makeRequest(func='GetUserData', body={}) {
  .then(response => response.json())
  .then(data => {
    console.log(data);
-   status = data.token_validate_status
+   status = data.status
    if (status == 22){
      return data
-   } else if (status == 14 || status == 15){
+   } else if (status == 14 || status == 15 || status == "null"){
      upd_tokens_status = updateTokens()
-     return makeRequest(func, body)
+     if (upd_tokens_status == 23){
+     	return makeRequest(func, body)
+     }
    } else if (status == 31){
      return makeRequest(func, body)
    }

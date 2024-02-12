@@ -13,6 +13,8 @@ function DropZone(){
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
+  window.getUserData = getUserData()
+
   return (
     <div>
       <div {...getRootProps()} id="drop-zone">
@@ -75,7 +77,14 @@ function DropZone(){
 	'folder_name': name,
 	'folder_parent': currdir,
      }
-     let data = window.makeRequest('CreateFolder', body)
+     window.makeRequest('CreateFolder', body)
+  }
+
+
+  function getUserData(){
+   console.log('start gettin data')
+   let data = makeRequest('GetUserData')
+   console.log(data)
   }
 };
 

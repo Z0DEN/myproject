@@ -21,18 +21,6 @@ function createFile(){
 }
 
 
-function getUserData(){
- console.log('start gettin data')
- body = {
-   test: 'test'
- }
- makeRequest('GetUserData', body)
-  .then(function(resp_data) {
-    console.log('response data: ', resp_data)
-  })
-}
-
-
 async function updateTokens(){
  console.log('start updating tokens');
  let response = await fetch('https://whoole.space/UserTokenUpdate/', {

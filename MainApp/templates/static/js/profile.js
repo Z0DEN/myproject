@@ -2,12 +2,6 @@ const csrf_cookie = Cookies.get('csrftoken')
 let access_token;
 let response_data;
 
-
-function mainFunc(){
-  console.log('start main function')
-}
-
-
 function createFile(){
   let input = document.getElementById("file-input");
   
@@ -54,13 +48,13 @@ async function makeRequest(func='GetUserData', body={}) {
      })
    });
    let data = await response.json();
-   console.log(data);
    status = data.status;
-   if (status == 22){
+   if (status >= 20 && status < 30){
+     console.log(data);
      return data;
    } else if (status == 14 || status == 15 || status == "null"){
      upd_tokens_status = await updateTokens();
-     if (upd_tokens_status == 23){
+     if (upd_tokens_status > 20){
         return makeRequest(func, body);
      }
    } else if (status == 31){

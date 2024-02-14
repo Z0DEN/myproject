@@ -62,8 +62,9 @@ function DropZone(){
      	    }}
      	  />
 	  {currdir !== "root" && <button className="prevFolder" onClick={() => {
-	     let prevFolder = userFiles.filter(item => item.name === currdir)
-	     console.log(prevFolder.parent)
+             let foundItem = userFiles.find(item => item.name === currdir);
+             let prevFolder = foundItem ? foundItem.parent : null;
+	     setCurrdir(prevFolder)
 	  }}>prev</button>}
 	  <div className="explorer">
 	    {explorer.length > 0 ? (
@@ -154,7 +155,7 @@ function DropZone(){
   function changeDirectory(){
     let	newExplorer = userFiles.filter(item => item.parent === currdir);
     setExplorer(newExplorer)
-    console.log(`new dir is ${currdir}`)
+    console.log(`set dir to ${currdir}`)
   }
 
 };

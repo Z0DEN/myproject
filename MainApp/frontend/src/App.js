@@ -10,7 +10,6 @@ function DropZone(){
   const [files, setFiles] = React.useState([]);
 
   const onDrop = useCallback(acceptedFiles => {
-    console.log(acceptedFiles.map(file => file.name));
     setFiles(acceptedFiles);
   }, []);
 
@@ -21,8 +20,8 @@ function DropZone(){
     }, []);
 
   useEffect(() => {
-      changeDirectory(); //func which modify explorer depending on currdir
-	  // eslint-disable-next-line
+      changeDirectory();
+      // eslint-disable-next-line
     }, [currdir]);
 
   return (
@@ -153,6 +152,7 @@ function DropZone(){
   };
 
   function changeDirectory(){
+    console.log(files);
     let	newExplorer = userFiles.filter(item => item.parent === currdir);
     setExplorer(newExplorer)
     console.log(`set dir to ${currdir}`)

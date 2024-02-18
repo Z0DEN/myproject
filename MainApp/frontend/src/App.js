@@ -45,7 +45,10 @@ function DropZone(){
           </ul>
         </aside>
 	  { files.length > 0 &&(
+	     <>
 	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
+	      <button id="send-files" onClick={sendFiles}>send files</button>
+	     </>
 	  )}
      	<div>
      	  <input
@@ -105,6 +108,12 @@ function DropZone(){
       return currentFiles.filter((item) => item.name !== nameToRemove);
     });
   };
+
+
+  async function sendFiles(){
+     let response = await window.makeRequest('SaveFiles', {}, files);
+     console.log(response)
+  }
 
 
   async function createFolder(name){

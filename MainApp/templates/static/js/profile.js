@@ -33,19 +33,37 @@ async function updateTokens(){
 }
 
 
-async function makeRequest(func='GetUserData', body={}) {
- try {
-   access_token = Cookies.get('access_token');
-   let response = await fetch(`https://${node_domain}.whoole.space:8002/${func}/`, {
-     method: 'POST',
-     headers: {
-       'Content-Type': 'application/json',
-       'Authorization': `user Bearer ${access_token}`
-     },
-     body: JSON.stringify({
+async function makeRequest(func='GetUserData', body={}, files=[]) {
+ access_token = Cookies.get('access_token');
+ let bodyData;
+ let headers = {
+       'Authorization': `user Bearer ${access_token}`,
+       'username': username,
+     };
+
+ if (files.length > 0){  
+     var formData = new FormData();
+     for (let i = 0; i < files.length; i++){
+        formData.append('user_files', files[i]);
+     }   
+     for (let key in body) {
+         formData.append(key, body[key]);
+     }
+     formData.append('username', username);
+     bodyData = formData;
+     console.log(bodyData)
+  } else{
+     bodyData = JSON.stringify({
        username: username,
        ...body,
      })
+  };
+
+ try {
+   let response = await fetch(`https://${node_domain}.whoole.space:8002/${func}/`, {
+     method: 'POST',
+     headers: headers,
+     body: bodyData,
    });
    let data = await response.json();
    status = data.status;
@@ -55,10 +73,10 @@ async function makeRequest(func='GetUserData', body={}) {
    } else if (status == 14 || status == 15 || status == "null"){
      upd_tokens_status = await updateTokens();
      if (upd_tokens_status > 20){
-        return makeRequest(func, body);
+        return makeRequest(func, body, files);
      }
    } else if (status == 31){
-     return makeRequest(func, body);
+     return makeRequest(func, body, files);
    }
  } catch (error) {
    console.error('Error:', error);

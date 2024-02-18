@@ -71,9 +71,8 @@ function DropZone(){
 	  <div className="explorer">
 	    {explorer.length > 0 ? (
 	      explorer.map((item, index) => (
-	          <button className="explorer-item" key={index} onClick={() => setCurrdir(item.name)}>
-	            {item.name}
-	          </button>
+	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.name)}>{item.name}</button>)
+		   :(<h5 className={`explorer-file ${getFileExtension(item.name)}`} key={index}>{item.name}</h5>)
 	      ))
 	    ) : isGetData === true && currdir === "root" ? (
 	      <h3>"Create your first folder or add a file!"</h3>
@@ -110,19 +109,43 @@ function DropZone(){
   };
 
 
+  function getFileExtension(filename) {
+    return filename.substring(filename.lastIndexOf('.') +  1);
+  }
+
+
   async function sendFiles(){
-     let body = {
-  	"parent": currdir,
-     }
+     let body = { "parent": currdir }
+     files.forEach(file => {
+	if (userFiles.some(item => item.name === file.name)){
+     	  alert(`File or folder with name "${file.name}" already exists`);
+     	  return;
+	}
+	let item = {
+            'type': 'file',
+            'name': file.name,
+            'parent': currdir, 
+            'date_added': file.lastModified,
+	}
+     	setUserFiles(prevUserFiles => [...prevUserFiles, item]);
+     	setExplorer(prevExplorer => [...prevExplorer, item]);
+     });
      let response = await window.makeRequest('SaveFiles', body, files);
-     console.log(response)
+     if (response.status !== 25){
+	files.forEach(file => {
+       	   deleteItemByName(file.name)
+	})
+	alert("We apologize, it didn't go as planned.")
+     } else {
+        setFiles([])
+     }
   }
 
 
   async function createFolder(name){
      const exists = userFiles.some(item => item.name === name);
      if (exists) {
-       alert(`Folder with name "${name}" already exists`);
+       alert(`File or folder with name "${name}" already exists`);
        return;
      }
      let item = {

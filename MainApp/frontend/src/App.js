@@ -26,14 +26,14 @@ function DropZone(){
 
   return (
     <div>
-      <div {...getRootProps()} id="drop-zone">
+      {files.length === 0 && <div {...getRootProps()} id="drop-zone">
         <input {...getInputProps()} />
         {isDragActive ? (
           <h3>Drop the files here ...</h3>
         ) : (
           <h3>Drag 'n' drop some files here, or click to select files</h3>
         )}
-      </div>
+      </div>}
         <aside>
           <ul id="files-map">
             {files.map((file, index) => (

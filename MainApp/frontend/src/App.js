@@ -111,7 +111,10 @@ function DropZone(){
 
 
   async function sendFiles(){
-     let response = await window.makeRequest('SaveFiles', {}, files);
+     let body = {
+  	"parent": currdir,
+     }
+     let response = await window.makeRequest('SaveFiles', body, files);
      console.log(response)
   }
 

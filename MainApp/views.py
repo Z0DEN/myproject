@@ -217,6 +217,9 @@ def UserLogin(request):
 @login_required
 def UserLogout(request):
     REDISKA.delete(f'user_secret_key:{request.user}')
+    request.user.user_access_token = 'user_access_token'
+    request.user.user_refresh_token = 'user_refresh_token'
+    request.user.save()
     logout(request)
     response = HttpResponseRedirect(reverse('MainApp:profile'))
     response.delete_cookie('access_token')

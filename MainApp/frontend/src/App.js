@@ -47,7 +47,7 @@ function DropZone(){
 	  { files.length > 0 &&(
 	     <>
 	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
-	      <button id="send-files" onClick={sendFiles}>send files</button>
+	      <button id="upload-files" onClick={uploadFiles}>upload files</button>
 	     </>
 	  )}
      	<div>
@@ -72,7 +72,13 @@ function DropZone(){
 	    {explorer.length > 0 ? (
 	      explorer.map((item, index) => (
 	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.name)}>{item.name}</button>)
-		   :(<h5 className={`explorer-file ${getFileExtension(item.name)}`} key={index}>{item.name}</h5>)
+		   :(<span key={item.id || index}>
+		         <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
+			 <button className="download-files" onClick={() => {
+				 downloadFiles([item.name])
+			 }}>*</button>
+	  	     </span>
+		   )
 	      ))
 	    ) : isGetData === true && currdir === "root" ? (
 	      <h3>"Create your first folder or add a file!"</h3>
@@ -114,7 +120,7 @@ function DropZone(){
   }
 
 
-  async function sendFiles(){
+  async function uploadFiles(){
      let body = { "parent": currdir }
      files.forEach(file => {
 	if (userFiles.some(item => item.name === file.name)){
@@ -130,7 +136,7 @@ function DropZone(){
      	setUserFiles(prevUserFiles => [...prevUserFiles, item]);
      	setExplorer(prevExplorer => [...prevExplorer, item]);
      });
-     let response = await window.makeRequest('SaveFiles', body, files);
+     const response = await window.makeRequest('UploadFiles', body, files);
      if (response.status !== 25){
 	files.forEach(file => {
        	   deleteItemByName(file.name)
@@ -141,6 +147,17 @@ function DropZone(){
      }
   }
 
+
+  async function downloadFiles(file_names){
+     console.log(file_names) 
+     if (file_names.length === 0){
+  	return
+     }
+     body = {
+	'file_names': file_names,	
+     }
+     const response = await window.makeRequest('DownloadFiles', body);
+  }
 
   async function createFolder(name){
      const exists = userFiles.some(item => item.name === name);
@@ -165,7 +182,7 @@ function DropZone(){
 	'folder_name': name,
 	'folder_parent': currdir,
      };
-     let data = await window.makeRequest('CreateFolder', body);
+     const data = await window.makeRequest('CreateFolder', body);
      if (data.status !== 24){
         deleteItemByName(name)
 	alert("We apologize, it didn't go as planned.")
@@ -175,7 +192,7 @@ function DropZone(){
 
   async function getUserData(){
      console.log('start gettin data');
-     let response = await window.makeRequest('GetUserData');
+     const response = await window.makeRequest('GetUserData');
      if (response.status < 20){
 	console.log(response.msg, response.status);
 	return;
@@ -185,6 +202,7 @@ function DropZone(){
      setExplorer(rootFiles)
      setIsGetData(true)
   };
+
 
   function changeDirectory(){
     console.log(files);

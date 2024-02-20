@@ -1,4 +1,4 @@
-import Cookies from 'js-cookie';
+//import Cookies from 'js-cookie';
 import React, { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 
@@ -151,29 +151,31 @@ function DropZone(){
 
 
   async function downloadFiles(file_name){
-     const access_token = Cookies.get('access_token');
-     console.log(access_token, window.username)
-     fetch(`https://${window.node_domain}.whoole.space:8002/media/${window.username}/${file_name}`, {
-       method: 'GET',
-       headers: {
-         'Accept': '*',
-         'Authorization': `user Bearer ${access_token}`,
-         'username': window.username,
-       }
-     })
-     .then(response => response.blob())
-     .then(blob => {
-       const url = window.URL.createObjectURL(blob);
-       const a = document.createElement('a');
-       a.style.display = 'none';
-       a.href = url;
-       a.download = file_name;
-       document.body.appendChild(a);
-       a.click();
-       window.URL.revokeObjectURL(url);
-     })
-     .catch(error => console.error('Error:', error));
+     let body = {'file_name': file_name}
+     const response = await window.makeRequest('DownloadFiles', body)
+     console.log(response)
   }
+     //const access_token = Cookies.get('access_token');
+     //fetch(`https://${window.node_domain}.whoole.space:8002/`, {
+     //  method: 'GET',
+     //  headers: {
+     //    'Accept': '*',
+     //    'Authorization': `user Bearer ${access_token}`,
+     //    'username': window.username,
+     //  },
+     //})
+     //.then(response => response.blob())
+     //.then(blob => {
+     //  const url = window.URL.createObjectURL(blob);
+     //  const a = document.createElement('a');
+     //  a.style.display = 'none';
+     //  a.href = url;
+     //  a.download = "script.js";
+     //  document.body.appendChild(a);
+     //  a.click();
+     //  window.URL.revokeObjectURL(url);
+     //})
+     //.catch(error => console.error('Error:', error));
 
 
   async function createFolder(name){

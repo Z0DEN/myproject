@@ -65,10 +65,13 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
      headers: headers,
      body: bodyData,
    });
+   if (response.headers.get('Content-Type') !== 'application/json'){
+      console.log('response is file', response.headers.get('Content-Type'))
+      return response
+   }
    let data = await response.json();
    status = data.status;
    if (status >= 20 && status < 30){
-     console.log(data);
      return data;
    } else if (status == 14 || status == 15 || status == "null"){
      upd_tokens_status = await updateTokens();

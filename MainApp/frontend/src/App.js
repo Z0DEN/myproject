@@ -138,14 +138,14 @@ function DropZone(){
      	setUserFiles(prevUserFiles => [...prevUserFiles, item]);
      	setExplorer(prevExplorer => [...prevExplorer, item]);
      });
-     const response = await window.makeRequest('UploadFiles', body, files);
-     if (response.status !== 25){
-	files.forEach(file => {
-       	   deleteItemByName(file.name)
-	})
-	alert("We apologize, it didn't go as planned.")
+     const data = await window.makeRequest('UploadFiles', body, files)
+     if (data.status !== 25){
+       files.forEach(file => {
+                deleteItemByName(file.name)
+       })
+       alert("We apologize, it didn't go as planned.")
      } else {
-        setFiles([])
+     setFiles([])
      }
   }
 
@@ -153,7 +153,15 @@ function DropZone(){
   async function downloadFiles(file_name){
      let body = {'file_name': file_name}
      const response = await window.makeRequest('DownloadFiles', body)
-     console.log(response)
+     let blob = await response.blob() 
+     const url = window.URL.createObjectURL(blob);
+     const a = document.createElement('a');
+     a.style.display = 'none';
+     a.href = url;
+     a.download = file_name;
+     document.body.appendChild(a);
+     a.click();
+     window.URL.revokeObjectURL(url);
   }
      //const access_token = Cookies.get('access_token');
      //fetch(`https://${window.node_domain}.whoole.space:8002/`, {
@@ -209,18 +217,18 @@ function DropZone(){
   };
 
 
-  async function getUserData(){
-     console.log('start gettin data');
-     const response = await window.makeRequest('GetUserData');
-     if (response.status < 20){
-	console.log(response.msg, response.status);
-	return;
-     };
-     setUserFiles(response.data);
-     const rootFiles = response.data.filter(item => item.parent === "root");
-     setExplorer(rootFiles)
-     setIsGetData(true)
-  };
+  async function getUserData() {
+    console.log('start getting data');
+    let data = await window.makeRequest('GetUserData');
+    if (data.status < 20) {
+      console.log(data.msg, data.status);
+      return;
+    }
+    setUserFiles(data.data);
+    const rootFiles = data.data.filter(item => item.parent === "root");
+    setExplorer(rootFiles);
+    setIsGetData(true);
+  }
 
 
   function changeDirectory(){

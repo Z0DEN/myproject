@@ -2,18 +2,6 @@ const csrf_cookie = Cookies.get('csrftoken')
 let access_token;
 let response_data;
 
-function createFile(){
-  let input = document.getElementById("file-input");
-  
-  let files = input.files;
-
-  if (files.length > 0) {
-    console.log(files.length)
-  } else {
-    console.log("Файлы не выбраны");
-  }
-}
-
 
 async function updateTokens(){
  console.log('start updating tokens');
@@ -38,20 +26,20 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
  let bodyData;
  let headers = {
        'Authorization': `user Bearer ${access_token}`,
-       'username': username,
+       'username': username, 
      };
 
  if (files.length > 0){  
      var formData = new FormData();
      for (let i = 0; i < files.length; i++){
         formData.append('user_files', files[i]);
-     }   
+     }
      for (let key in body) {
          formData.append(key, body[key]);
      }
      formData.append('username', username);
      bodyData = formData;
-     console.log(bodyData)
+     console.log(bodyData);
   } else{
      bodyData = JSON.stringify({
        username: username,
@@ -65,21 +53,22 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
      headers: headers,
      body: bodyData,
    });
-   if (response.headers.get('Content-Type') !== 'application/json'){
-      console.log('response is file', response.headers.get('Content-Type'))
-      return response
+   const contentType = response.headers.get('Content-Type')
+   if (contentType !== 'application/json'){
+     console.log(contentType)
+     return response
    }
-   let data = await response.json();
-   status = data.status;
+   data = await response.json()
+   status = data.status 
    if (status >= 20 && status < 30){
      return data;
    } else if (status == 14 || status == 15 || status == "null"){
      upd_tokens_status = await updateTokens();
      if (upd_tokens_status > 20){
-        return makeRequest(func, body, files);
+        return await makeRequest(func, body, files);
      }
    } else if (status == 31){
-     return makeRequest(func, body, files);
+     return await makeRequest(func, body, files);
    }
  } catch (error) {
    console.error('Error:', error);

@@ -139,7 +139,7 @@ function DropZone(){
      	setExplorer(prevExplorer => [...prevExplorer, item]);
      });
      const data = await window.makeRequest('UploadFiles', body, files)
-     if (data.status !== 25){
+     if (data.status == 25){
        data.existed_files.forEach(file => {
                 deleteItemByName(file.name)
        })

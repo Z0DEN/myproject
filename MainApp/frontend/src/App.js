@@ -1,14 +1,16 @@
 //import Cookies from 'js-cookie';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState} from 'react';
 import { useDropzone } from 'react-dropzone';
 
 
 function DropZone(){
-  const [explorer, setExplorer] = React.useState([]);
-  const [userFiles, setUserFiles] = React.useState([]);
-  const [currdir, setCurrdir] = React.useState('root');
-  const [isGetData, setIsGetData] = React.useState(false);
-  const [files, setFiles] = React.useState([]);
+  const [explorer, setExplorer] = useState([]);
+  const [userFiles, setUserFiles] = useState([]);
+  const [currdir, setCurrdir] = useState('root');
+  const [isGetData, setIsGetData] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationText, setNotificationText] = useState('');
 
   const onDrop = useCallback(acceptedFiles => {
     setFiles(acceptedFiles);
@@ -39,7 +41,7 @@ function DropZone(){
           <ul id="files-map">
             {files.map((file, index) => (
               <li key={file.path}>
-                <button className="file-remove-btn" onClick={() => removeFile(index)}>x</button>
+                <button className="file-remove-btn" onClick={() => removeFileFromInput(index)}>x</button>
                 <h5>{file.name}</h5>
               </li>
             ))}
@@ -89,25 +91,41 @@ function DropZone(){
 	      <h3>"Getting your data"</h3>
 	    )}
 	  </div>
+	    {showNotification && <h3 className="Notification">{notificationText}</h3>}
      	</div>
     </div>
   );
 
-			// <a href={`https://node2.whoole.space:8002/media/${window.username}/${item.name}`}>open {item.name}</a>
+// <a href={`https://node2.whoole.space:8002/media/${window.username}/${item.name}`}>open {item.name}</a>
+
+  function Notification(text){
+    if (text && showNotification === false){
+	setNotificationText(text);
+        setShowNotification(true);
+        const timer = setTimeout(() => {
+          setShowNotification(false);
+//	  setNotificationText('');
+        }, 5000);
+        return () => {
+          clearTimeout(timer);
+        };
+      }
+  };
   
+
   function removeAllFiles(){
     setFiles([]);
   };
 
 
-  function removeFile(index){
+  function removeFileFromInput(index){
     const newFiles = [...files];
     newFiles.splice(index,  1);
     setFiles(newFiles);
   };
 
 
-  function deleteItemByName(nameToRemove){
+  function deleteItemFromUserFiles(nameToRemove){
     setUserFiles((currentFiles) => {
       return currentFiles.filter((item) => item.name !== nameToRemove);
     });
@@ -124,28 +142,41 @@ function DropZone(){
 
   async function uploadFiles(){
      let body = { "parent": currdir }
-     files.forEach(file => {
-	if (userFiles.some(item => item.name === file.name)){
-     	  alert(`File or folder with name "${file.name}" already exists`);
-     	  return;
-	}
-	let item = {
-            'type': 'file',
-            'name': file.name,
-            'parent': currdir, 
-            'date_added': file.lastModified,
-	}
-     	setUserFiles(prevUserFiles => [...prevUserFiles, item]);
-     	setExplorer(prevExplorer => [...prevExplorer, item]);
-     });
+     if (files.length > 0){
+       for (let i=0; i < files.length; i++) {
+	 let file = files[i];
+         if (userFiles.some(item => item.name === file.name && item.parent === currdir)){
+       	   Notification(`File or folder with name "${file.name}" already exists`);
+           removeFileFromInput(file.name);
+           continue;
+         }
+         let item = {
+             'type': 'file',
+             'name': file.name,
+             'parent': currdir, 
+             'date_added': file.lastModified,
+         };
+       	 setUserFiles(prevUserFiles => [...prevUserFiles, item]);
+       	 setExplorer(prevExplorer => [...prevExplorer, item]);
+       };
+     } else{
+       console.log('files is empty')
+     }
      const data = await window.makeRequest('UploadFiles', body, files)
-     if (data.status == 25){
-       data.existed_files.forEach(file => {
-                deleteItemByName(file.name)
-       })
-       alert("We apologize, it didn't go as planned.")
-     } else {
-     setFiles([])
+     try{
+       setFiles([])
+       if (data.status == 18){
+         Notification(`These files already exists: ${data.existed_files.join(', ')}`)
+	 data.existed_files.forEach(name =>{
+	   deleteItemFromUserFiles(name)
+	 });
+       } else if (data.status == 13){
+	 Notification(data.msg)
+       } else {
+         Notification("Upload is done")
+       }
+     } catch(error){
+	console.log(error)
      }
   }
 
@@ -153,7 +184,10 @@ function DropZone(){
   async function downloadFiles(file_name){
      let body = {'file_name': file_name}
      const response = await window.makeRequest('DownloadFiles', body)
+//     const jsonString = JSON.stringify(response);
+//     const blob = new Blob([jsonString], {type: "application/json"});
      let blob = await response.blob() 
+	  console.log(blob)
      const url = window.URL.createObjectURL(blob);
      const a = document.createElement('a');
      a.style.display = 'none';
@@ -163,33 +197,17 @@ function DropZone(){
      a.click();
      window.URL.revokeObjectURL(url);
   }
-     //const access_token = Cookies.get('access_token');
-     //fetch(`https://${window.node_domain}.whoole.space:8002/`, {
-     //  method: 'GET',
-     //  headers: {
-     //    'Accept': '*',
-     //    'Authorization': `user Bearer ${access_token}`,
-     //    'username': window.username,
-     //  },
-     //})
-     //.then(response => response.blob())
-     //.then(blob => {
-     //  const url = window.URL.createObjectURL(blob);
-     //  const a = document.createElement('a');
-     //  a.style.display = 'none';
-     //  a.href = url;
-     //  a.download = "script.js";
-     //  document.body.appendChild(a);
-     //  a.click();
-     //  window.URL.revokeObjectURL(url);
-     //})
-     //.catch(error => console.error('Error:', error));
 
 
   async function createFolder(name){
-     const exists = userFiles.some(item => item.name === name);
+     if (name === ""){
+        Notification("folder name must be a non-empty string");
+        return;
+     }
+
+     const exists = userFiles.some(item => item.name === name && item.parent === currdir);
      if (exists) {
-       alert(`File or folder with name "${name}" already exists`);
+       Notification(`File or folder with name "${name}" already exists`);
        return;
      }
      let item = {
@@ -201,19 +219,15 @@ function DropZone(){
      setUserFiles(prevUserFiles => [...prevUserFiles, item]);
      setExplorer(prevExplorer => [...prevExplorer, item]);
 
-     if (name === ""){
-        alert("folder name must be a non-empty string");
-        return;
-     };
      let body = {
 	'folder_name': name,
 	'folder_parent': currdir,
      };
      const data = await window.makeRequest('CreateFolder', body);
-     if (data.status !== 24){
-        deleteItemByName(name)
-	alert("We apologize, it didn't go as planned.")
+     if (data.status == 18){
+        deleteItemFromUserFiles(name)
      }
+     Notification(data.msg)
   };
 
 
@@ -232,7 +246,6 @@ function DropZone(){
 
 
   function changeDirectory(){
-    console.log(files);
     let	newExplorer = userFiles.filter(item => item.parent === currdir);
     setExplorer(newExplorer)
     console.log(`set dir to ${currdir}`)

@@ -53,22 +53,20 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
      headers: headers,
      body: bodyData,
    });
-   const contentType = response.headers.get('Content-Type')
-   if (contentType !== 'application/json'){
-     console.log(contentType)
-     return response
-   }
+   const contentType = await response.headers.get('Content-Type')
+   console.log(contentType)
    data = await response.json()
+   console.log(data)
    status = data.status 
-   if (status >= 20 && status < 30){
-     return data;
-   } else if (status == 14 || status == 15 || status == "null"){
+   if (status == 14 || status == 15 || status == "null"){
      upd_tokens_status = await updateTokens();
      if (upd_tokens_status > 20){
         return await makeRequest(func, body, files);
      }
    } else if (status == 31){
      return await makeRequest(func, body, files);
+   } else {
+     return data;
    }
  } catch (error) {
    console.error('Error:', error);

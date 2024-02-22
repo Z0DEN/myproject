@@ -140,7 +140,7 @@ function DropZone(){
      });
      const data = await window.makeRequest('UploadFiles', body, files)
      if (data.status !== 25){
-       files.forEach(file => {
+       data.existed_files.forEach(file => {
                 deleteItemByName(file.name)
        })
        alert("We apologize, it didn't go as planned.")

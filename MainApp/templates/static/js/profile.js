@@ -41,6 +41,7 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
      bodyData = formData;
      console.log(bodyData);
   } else{
+     console.log(body)
      bodyData = JSON.stringify({
        username: username,
        ...body,

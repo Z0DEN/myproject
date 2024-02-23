@@ -55,7 +55,7 @@ function DropZone(){
      };
      const data = await window.makeRequest('CreateFolder', body);
      if (data.status === 18){
-        deleteItemFromUserFiles(name)
+        deleteItemFromFiles(name)
         Notification(data.msg)
      }
      Notification(`Created folder "${name}"`)
@@ -63,13 +63,13 @@ function DropZone(){
 
 
   async function uploadFiles(){
-     let body = { "parent": currdir }
      if (files.length > 0){
+       var body = { "parent": currdir }
        for (let i=0; i < files.length; i++) {
 	 let file = files[i];
          if (userFiles.some(item => item.name === file.name && item.parent === currdir)){
        	   Notification(`File or folder with name "${file.name}" already exists`);
-           removeFileFromInput(file.name);
+         //  removeFileFromInput(file.name);
            continue;
          }
          let item = {
@@ -86,20 +86,26 @@ function DropZone(){
      }
      const data = await window.makeRequest('UploadFiles', body, files)
      try{
-       setFiles([])
        if (data.status === 18){
          Notification(`These files already exists: ${data.existed_files.join(', ')}`)
 	 data.existed_files.forEach(name =>{
-	   deleteItemFromUserFiles(name)
+	   deleteItemFromFiles(name)
 	 });
        } else if (data.status === 13){
+	 files.forEach(name =>{
+	   deleteItemFromFiles(name)
+	 });
 	 Notification(data.msg)
        } else {
          Notification("Upload is done")
        }
      } catch(error){
 	console.log(error)
+	files.forEach(file =>{
+	  deleteItemFromFiles(file.name)
+	});
      }
+     setFiles([])
   }
 
 
@@ -146,7 +152,7 @@ function DropZone(){
 
 
   const changeDirectory = useCallback(() => {
-    let	newExplorer = userFiles.filter(item => item.parent === currdir);
+    let	newExplorer = userFiles.filter(item => item.parent.includes(currdir));
     setExplorer(newExplorer)
     console.log(`set dir to ${currdir}`)
   }, [currdir]);
@@ -246,7 +252,7 @@ function DropZone(){
   };
 
 
-  function deleteItemFromUserFiles(nameToRemove){
+  function deleteItemFromFiles(nameToRemove){
     setUserFiles((currentFiles) => {
       return currentFiles.filter((item) => item.name !== nameToRemove);
     });

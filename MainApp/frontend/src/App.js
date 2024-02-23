@@ -6,7 +6,7 @@ import { useDropzone } from 'react-dropzone';
 function DropZone(){
   const [explorer, setExplorer] = useState([]);
   const [userFiles, setUserFiles] = useState([]);
-  const [currdir, setCurrdir] = useState('root');
+  const [currdir, setCurrdir] = useState(null);
   const [isGetData, setIsGetData] = useState(false);
   const [files, setFiles] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
@@ -130,7 +130,7 @@ function DropZone(){
         return;
       }
       setUserFiles(data.data);
-      const rootFiles = data.data.filter(item => item.parent === "root");
+      const rootFiles = data.data.filter(item => item.parent === null);
       setExplorer(rootFiles);
       setIsGetData(true);
     } catch (error) {
@@ -142,14 +142,14 @@ function DropZone(){
 
   useEffect(() => {
     getUserData();
-  }, [getUserData]);
+  }, []);
 
 
   const changeDirectory = useCallback(() => {
     let	newExplorer = userFiles.filter(item => item.parent === currdir);
     setExplorer(newExplorer)
     console.log(`set dir to ${currdir}`)
-  }, [currdir, userFiles]);
+  }, [currdir]);
 
 
   useEffect(() => {
@@ -202,7 +202,7 @@ function DropZone(){
      	      }
      	    }}
      	  />
-	  {currdir !== "root" && <button className="prevFolder" onClick={() => {
+	  {currdir !== null && <button className="prevFolder" onClick={() => {
              let foundItem = userFiles.find(item => item.name === currdir);
              let prevFolder = foundItem ? foundItem.parent : null;
 	     setCurrdir(prevFolder)
@@ -219,9 +219,9 @@ function DropZone(){
 	  	     </span>
 		   )
 	      ))
-	    ) : isGetData === true && currdir === "root" ? (
+	    ) : isGetData === true && currdir === null ? (
 	      <h3>"Create your first folder or add a file!"</h3>
-	    ) : isGetData === true && currdir !== "root" ? (
+	    ) : isGetData === true && currdir !== null ? (
 	      <h3>"Folder is empty"</h3>
 	    ) : (
 	      <h3>"Getting your data"</h3>

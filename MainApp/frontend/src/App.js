@@ -12,20 +12,155 @@ function DropZone(){
   const [showNotification, setShowNotification] = useState(false);
   const [notificationText, setNotificationText] = useState('');
 
+
+  const Notification = useCallback((text) => {
+    if (text && showNotification === false){
+	setNotificationText(text);
+        setShowNotification(true);
+        const timer = setTimeout(() => {
+          setShowNotification(false);
+        }, 5000);
+        return () => {
+          clearTimeout(timer);
+        };
+    } else{ 
+       return;
+    }
+  }, [showNotification]);
+
+
+  async function createFolder(name){
+     if (name === ""){
+        Notification("folder name must be a non-empty string");
+        return;
+     }
+
+     const exists = userFiles.some(item => item.name === name && item.parent === currdir);
+     if (exists) {
+       Notification(`File or folder with name "${name}" already exists`);
+       return;
+     }
+     let item = {
+        'name': name,
+        'parent': currdir, 
+        'type': 'folder',
+     };
+
+     setUserFiles(prevUserFiles => [...prevUserFiles, item]);
+     setExplorer(prevExplorer => [...prevExplorer, item]);
+
+     let body = {
+	'folder_name': name,
+	'folder_parent': currdir,
+     };
+     const data = await window.makeRequest('CreateFolder', body);
+     if (data.status === 18){
+        deleteItemFromUserFiles(name)
+     }
+     Notification(data.msg)
+  };
+
+
+  async function uploadFiles(){
+     let body = { "parent": currdir }
+     if (files.length > 0){
+       for (let i=0; i < files.length; i++) {
+	 let file = files[i];
+         if (userFiles.some(item => item.name === file.name && item.parent === currdir)){
+       	   Notification(`File or folder with name "${file.name}" already exists`);
+           removeFileFromInput(file.name);
+           continue;
+         }
+         let item = {
+             'type': 'file',
+             'name': file.name,
+             'parent': currdir, 
+             'date_added': file.lastModified,
+         };
+       	 setUserFiles(prevUserFiles => [...prevUserFiles, item]);
+       	 setExplorer(prevExplorer => [...prevExplorer, item]);
+       };
+     } else{
+       console.log('files is empty')
+     }
+     const data = await window.makeRequest('UploadFiles', body, files)
+     try{
+       setFiles([])
+       if (data.status === 18){
+         Notification(`These files already exists: ${data.existed_files.join(', ')}`)
+	 data.existed_files.forEach(name =>{
+	   deleteItemFromUserFiles(name)
+	 });
+       } else if (data.status === 13){
+	 Notification(data.msg)
+       } else {
+         Notification("Upload is done")
+       }
+     } catch(error){
+	console.log(error)
+     }
+  }
+
+
+  async function downloadFiles(file_name){
+     let body = {'file_name': file_name}
+     const response = await window.makeRequest('DownloadFiles', body)
+//     const jsonString = JSON.stringify(response);
+//     const blob = new Blob([jsonString], {type: "application/json"});
+     let blob = await response.blob() 
+	  console.log(blob)
+     const url = window.URL.createObjectURL(blob);
+     const a = document.createElement('a');
+     a.style.display = 'none';
+     a.href = url;
+     a.download = file_name;
+     document.body.appendChild(a);
+     a.click();
+     window.URL.revokeObjectURL(url);
+  }
+
+
+  const getUserData = useCallback(async () => {
+    console.log('start getting data');
+    try {
+      let data = await window.makeRequest('GetUserData');
+      if (data.status <  20) {
+        console.log(data.msg, data.status);
+        return;
+      }
+      setUserFiles(data.data);
+      const rootFiles = data.data.filter(item => item.parent === "root");
+      setExplorer(rootFiles);
+      setIsGetData(true);
+    } catch (error) {
+      console.log(error);
+      Notification("Error occurs while getting your data");
+    }
+  }, [Notification]);
+
+
+  useEffect(() => {
+    getUserData();
+  }, [getUserData]);
+
+
+  const changeDirectory = useCallback(() => {
+    let	newExplorer = userFiles.filter(item => item.parent === currdir);
+    setExplorer(newExplorer)
+    console.log(`set dir to ${currdir}`)
+  }, [currdir, userFiles]);
+
+
+  useEffect(() => {
+      changeDirectory();
+    }, [currdir, changeDirectory]);
+
+
   const onDrop = useCallback(acceptedFiles => {
     setFiles(acceptedFiles);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
-  useEffect(() => {
-      getUserData();
-    }, []);
-
-  useEffect(() => {
-      changeDirectory();
-      // eslint-disable-next-line
-    }, [currdir]);
 
   return (
     <div>
@@ -98,21 +233,6 @@ function DropZone(){
 
 // <a href={`https://node2.whoole.space:8002/media/${window.username}/${item.name}`}>open {item.name}</a>
 
-  function Notification(text){
-    if (text && showNotification === false){
-	setNotificationText(text);
-        setShowNotification(true);
-        const timer = setTimeout(() => {
-          setShowNotification(false);
-//	  setNotificationText('');
-        }, 5000);
-        return () => {
-          clearTimeout(timer);
-        };
-      }
-  };
-  
-
   function removeAllFiles(){
     setFiles([]);
   };
@@ -137,118 +257,6 @@ function DropZone(){
 
   function getFileExtension(filename) {
     return filename.substring(filename.lastIndexOf('.') +  1);
-  }
-
-
-  async function uploadFiles(){
-     let body = { "parent": currdir }
-     if (files.length > 0){
-       for (let i=0; i < files.length; i++) {
-	 let file = files[i];
-         if (userFiles.some(item => item.name === file.name && item.parent === currdir)){
-       	   Notification(`File or folder with name "${file.name}" already exists`);
-           removeFileFromInput(file.name);
-           continue;
-         }
-         let item = {
-             'type': 'file',
-             'name': file.name,
-             'parent': currdir, 
-             'date_added': file.lastModified,
-         };
-       	 setUserFiles(prevUserFiles => [...prevUserFiles, item]);
-       	 setExplorer(prevExplorer => [...prevExplorer, item]);
-       };
-     } else{
-       console.log('files is empty')
-     }
-     const data = await window.makeRequest('UploadFiles', body, files)
-     try{
-       setFiles([])
-       if (data.status == 18){
-         Notification(`These files already exists: ${data.existed_files.join(', ')}`)
-	 data.existed_files.forEach(name =>{
-	   deleteItemFromUserFiles(name)
-	 });
-       } else if (data.status == 13){
-	 Notification(data.msg)
-       } else {
-         Notification("Upload is done")
-       }
-     } catch(error){
-	console.log(error)
-     }
-  }
-
-
-  async function downloadFiles(file_name){
-     let body = {'file_name': file_name}
-     const response = await window.makeRequest('DownloadFiles', body)
-//     const jsonString = JSON.stringify(response);
-//     const blob = new Blob([jsonString], {type: "application/json"});
-     let blob = await response.blob() 
-	  console.log(blob)
-     const url = window.URL.createObjectURL(blob);
-     const a = document.createElement('a');
-     a.style.display = 'none';
-     a.href = url;
-     a.download = file_name;
-     document.body.appendChild(a);
-     a.click();
-     window.URL.revokeObjectURL(url);
-  }
-
-
-  async function createFolder(name){
-     if (name === ""){
-        Notification("folder name must be a non-empty string");
-        return;
-     }
-
-     const exists = userFiles.some(item => item.name === name && item.parent === currdir);
-     if (exists) {
-       Notification(`File or folder with name "${name}" already exists`);
-       return;
-     }
-     let item = {
-        'name': name,
-        'parent': currdir, 
-        'type': 'folder',
-     };
-
-     setUserFiles(prevUserFiles => [...prevUserFiles, item]);
-     setExplorer(prevExplorer => [...prevExplorer, item]);
-
-     let body = {
-	'folder_name': name,
-	'folder_parent': currdir,
-     };
-     const data = await window.makeRequest('CreateFolder', body);
-     if (data.status == 18){
-        deleteItemFromUserFiles(name)
-     }
-     Notification(data.msg)
-  };
-
-
-  async function getUserData() {
-    console.log('start getting data');
-    let data = await window.makeRequest('GetUserData');
-    if (data.status < 20) {
-      console.log(data.msg, data.status);
-      return;
-    }
-    setUserFiles(data.data);
-    const rootFiles = data.data.filter(item => item.parent === "root");
-    setExplorer(rootFiles);
-    setIsGetData(true);
-  }
-
-
-  function changeDirectory(){
-    let	newExplorer = userFiles.filter(item => item.parent === currdir);
-    setExplorer(newExplorer)
-    console.log(`set dir to ${currdir}`)
   }
 
 };

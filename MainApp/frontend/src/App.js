@@ -37,7 +37,7 @@ function DropZone(){
 
      const exists = userFiles.some(item => item.name === name && item.parent === currdir);
      if (exists) {
-       Notification(`File or folder with name "${name}" already exists`);
+       Notification(`File folder with name "${name}" already exists`);
        return;
      }
      let item = {
@@ -56,8 +56,9 @@ function DropZone(){
      const data = await window.makeRequest('CreateFolder', body);
      if (data.status === 18){
         deleteItemFromUserFiles(name)
+        Notification(data.msg)
      }
-     Notification(data.msg)
+     Notification(`Created folder "${name}"`)
   };
 
 

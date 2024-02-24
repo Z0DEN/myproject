@@ -1,4 +1,5 @@
 //import Cookies from 'js-cookie';
+import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState} from 'react';
 import { useDropzone } from 'react-dropzone';
 
@@ -35,15 +36,21 @@ function DropZone(){
         return;
      }
 
-     const exists = userFiles.some(item => item.name === name && item.parent === currdir);
+     const exists = userFiles.some(item => item.name === name && item.parent_id === currdir);
      if (exists) {
        Notification(`File folder with name "${name}" already exists`);
        return;
      }
+
+     let folder_id = uuidv4();
+     const d = new Date();
+     
      let item = {
-        'name': name,
-        'parent': currdir, 
         'type': 'folder',
+        'name': name,
+	'folder_id': folder_id,
+        'parent_id': [currdir], 
+	'data_added': d.toISOString(),
      };
 
      setUserFiles(prevUserFiles => [...prevUserFiles, item]);
@@ -51,7 +58,8 @@ function DropZone(){
 
      let body = {
 	'folder_name': name,
-	'folder_parent': currdir,
+	'folder_id': folder_id,
+	'parent_id': currdir,
      };
      const data = await window.makeRequest('CreateFolder', body);
      if (data.status !== 24){
@@ -64,10 +72,10 @@ function DropZone(){
 
   async function uploadFiles(){
      if (files.length > 0){
-       var body = { "parent": currdir }
+       var body = { 'parent_id': currdir }
        for (let i=0; i < files.length; i++) {
 	 let file = files[i];
-         if (userFiles.some(item => item.name === file.name && item.parent === currdir)){
+         if (userFiles.some(item => item.name === file.name && item.parent_id === currdir)){
        	   Notification(`File or folder with name "${file.name}" already exists`);
          //  removeFileFromInput(file.name);
            continue;
@@ -75,7 +83,7 @@ function DropZone(){
          let item = {
              'type': 'file',
              'name': file.name,
-             'parent': currdir, 
+             'parent_id': [currdir],
              'date_added': file.lastModified,
          };
        	 setUserFiles(prevUserFiles => [...prevUserFiles, item]);
@@ -84,15 +92,22 @@ function DropZone(){
      } else{
        console.log('files is empty')
      }
+	console.log('before forming formdata: ', body)
      const data = await window.makeRequest('UploadFiles', body, files)
      try{
-       if (data.status !== 25){
-         Notification(data.msg)
-	 data.existed_files.forEach(name =>{
+       if (data.status === 25){
+         Notification("Upload is done")
+       } else if(data.status === 18){
+	 Notification(data.msg)
+	 files.forEach(name =>{
 	   deleteItemFromFiles(name)
 	 });
-       } else {
-         Notification("Upload is done")
+       } else if (data.status === 13){
+         const foundFolder = userFiles.find(item => item.folder_id === currdir).name
+         Notification(`Folder ${foundFolder} does not exists`)
+	 files.forEach(name =>{
+	   deleteItemFromFiles(name)
+	 });
        }
      } catch(error){
 	console.log(error)
@@ -149,7 +164,10 @@ function DropZone(){
   const changeDirectory = useCallback(() => {
     let	newExplorer = userFiles.filter(item => item.parent_id.includes(currdir));
     setExplorer(newExplorer)
-    console.log(`set dir to ${currdir}`)
+//    const foundItem = userFiles.find(item => item.folder_id === currdir);
+//    if (foundItem){
+//      console.log(`set dir to`, foundItem.name)
+//    }
   }, [currdir]);
 
 
@@ -204,8 +222,8 @@ function DropZone(){
      	    }}
      	  />
 	  {currdir !== null && <button className="prevFolder" onClick={() => {
-             let foundItem = userFiles.find(item => item.name === currdir);
-             let prevFolder = foundItem ? foundItem.parent : null;
+             let foundItem = userFiles.find(item => item.folder_id === currdir);
+             let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
 	  }}>prev</button>}
 	  <div className="explorer">

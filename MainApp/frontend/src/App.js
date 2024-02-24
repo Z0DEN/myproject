@@ -7,9 +7,9 @@ import { useDropzone } from 'react-dropzone';
 function DropZone(){
   const [explorer, setExplorer] = useState([]);
   const [userFiles, setUserFiles] = useState([]);
+  const [files, setFiles] = useState([]);
   const [currdir, setCurrdir] = useState(null);
   const [isGetData, setIsGetData] = useState(false);
-  const [files, setFiles] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationText, setNotificationText] = useState('');
 
@@ -72,6 +72,7 @@ function DropZone(){
 
   async function uploadFiles(){
      if (files.length > 0){
+       var filesToUpload = [];
        var body = { 'parent_id': currdir }
        for (let i=0; i < files.length; i++) {
 	 let file_item = files[i];
@@ -79,6 +80,7 @@ function DropZone(){
        	   Notification(`File or folder with name "${file_item.file.name}" already exists`);
            continue;
          }
+	 body[file_item.file.name] = file_item.item_id;
          let item = {
              'type': 'file',
              'name': file_item.file.name,
@@ -86,26 +88,27 @@ function DropZone(){
              'parent_id': [currdir],
              'date_added': file_item.file.lastModified,
          };
-	       console.log(currdir)
        	 setUserFiles(prevUserFiles => [...prevUserFiles, item]);
        	 setExplorer(prevExplorer => [...prevExplorer, item]);
+	 filesToUpload.push(file_item.file);
        };
      } else{
        console.log('files is empty')
      }
-     const data = await window.makeRequest('UploadFiles', body, files)
+     console.log(filesToUpload)
+     const data = await window.makeRequest('UploadFiles', body, filesToUpload)
      try{
        if (data.status === 25){
          Notification("Upload is done")
        } else if(data.status === 18){
 	 Notification(data.msg)
-	 files.forEach(file_item =>{
+	 files.forEach(file_item => {
 	   deleteItemFromFiles(file_item.item_id)
 	 });
        } else if (data.status === 13){
-         const foundFolder = userFiles.find(item => item.item_id[0] === currdir).name
+         const foundFolder = userFiles.find(item => item.item_id === currdir).name
          Notification(`Folder ${foundFolder} does not exists`)
-	 files.forEach(file_item =>{
+	 files.forEach(file_item => {
 	   deleteItemFromFiles(file_item.item_id)
 	 });
        }
@@ -228,14 +231,14 @@ function DropZone(){
      	    }}
      	  />
 	  {currdir !== null && <button className="prevFolder" onClick={() => {
-             let foundItem = userFiles.find(item => item.item_id[0] === currdir);
+             let foundItem = userFiles.find(item => item.item_id === currdir);
              let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
 	  }}>prev</button>}
 	  <div className="explorer">
 	    {explorer.length > 0 ? (
 	      explorer.map((item, index) => (
-	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id[0])}>{item.name}</button>)
+	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>)
 		   :(<span key={item.id || index}>
 		         <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 			 <button className="download-files" onClick={() => {

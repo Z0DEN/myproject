@@ -54,7 +54,7 @@ function DropZone(){
 	'folder_parent': currdir,
      };
      const data = await window.makeRequest('CreateFolder', body);
-     if (data.status === 18){
+     if (data.status !== 24){
         deleteItemFromFiles(name)
         Notification(data.msg)
      }
@@ -86,16 +86,11 @@ function DropZone(){
      }
      const data = await window.makeRequest('UploadFiles', body, files)
      try{
-       if (data.status === 18){
-         Notification(`These files already exists: ${data.existed_files.join(', ')}`)
+       if (data.status !== 25){
+         Notification(data.msg)
 	 data.existed_files.forEach(name =>{
 	   deleteItemFromFiles(name)
 	 });
-       } else if (data.status === 13){
-	 files.forEach(name =>{
-	   deleteItemFromFiles(name)
-	 });
-	 Notification(data.msg)
        } else {
          Notification("Upload is done")
        }
@@ -131,12 +126,12 @@ function DropZone(){
     console.log('start getting data');
     try {
       let data = await window.makeRequest('GetUserData');
-      if (data.status <  20) {
+      if (data.status < 20) {
         console.log(data.msg, data.status);
         return;
       }
       setUserFiles(data.data);
-      const rootFiles = data.data.filter(item => item.parent === null);
+      const rootFiles = data.data.filter(item => item.parent_id.includes(null));
       setExplorer(rootFiles);
       setIsGetData(true);
     } catch (error) {
@@ -152,7 +147,7 @@ function DropZone(){
 
 
   const changeDirectory = useCallback(() => {
-    let	newExplorer = userFiles.filter(item => item.parent.includes(currdir));
+    let	newExplorer = userFiles.filter(item => item.parent_id.includes(currdir));
     setExplorer(newExplorer)
     console.log(`set dir to ${currdir}`)
   }, [currdir]);
@@ -216,7 +211,7 @@ function DropZone(){
 	  <div className="explorer">
 	    {explorer.length > 0 ? (
 	      explorer.map((item, index) => (
-	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.name)}>{item.name}</button>)
+	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.folder_id)}>{item.name}</button>)
 		   :(<span key={item.id || index}>
 		         <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 			 <button className="download-files" onClick={() => {

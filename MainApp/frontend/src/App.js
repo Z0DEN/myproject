@@ -95,7 +95,6 @@ function DropZone(){
      } else{
        console.log('files is empty')
      }
-     console.log(filesToUpload)
      const data = await window.makeRequest('UploadFiles', body, filesToUpload)
      try{
        if (data.status === 25){
@@ -167,7 +166,6 @@ function DropZone(){
   const changeDirectory = useCallback(() => {
     let	newExplorer = userFiles.filter(item => item.parent_id.includes(currdir));
     setExplorer(newExplorer)
-    console.log(files)
 //    const foundItem = userFiles.find(item => item.item_id === currdir);
 //    if (foundItem){
 //      console.log(`set dir to`, foundItem.name)

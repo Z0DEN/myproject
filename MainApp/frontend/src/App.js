@@ -36,19 +36,19 @@ function DropZone(){
         return;
      }
 
-     const exists = userFiles.some(item => item.name === name && item.parent_id === currdir);
+     const exists = userFiles.some(item => item.name === name && item.parent_id[0] === currdir);
      if (exists) {
        Notification(`File folder with name "${name}" already exists`);
        return;
      }
 
-     let folder_id = uuidv4();
+     let item_id = uuidv4();
      const d = new Date();
      
      let item = {
         'type': 'folder',
         'name': name,
-	'folder_id': folder_id,
+	'item_id': item_id,
         'parent_id': [currdir], 
 	'data_added': d.toISOString(),
      };
@@ -58,12 +58,12 @@ function DropZone(){
 
      let body = {
 	'folder_name': name,
-	'folder_id': folder_id,
+	'item_id': item_id,
 	'parent_id': currdir,
      };
      const data = await window.makeRequest('CreateFolder', body);
      if (data.status !== 24){
-        deleteItemFromFiles(name)
+        deleteItemFromFiles(item_id)
         Notification(data.msg)
      }
      Notification(`Created folder "${name}"`)
@@ -74,45 +74,45 @@ function DropZone(){
      if (files.length > 0){
        var body = { 'parent_id': currdir }
        for (let i=0; i < files.length; i++) {
-	 let file = files[i];
-         if (userFiles.some(item => item.name === file.name && item.parent_id === currdir)){
-       	   Notification(`File or folder with name "${file.name}" already exists`);
-         //  removeFileFromInput(file.name);
+	 let file_item = files[i];
+         if (userFiles.some(item => item.name === file_item.file.name && item.parent_id[0] === currdir)){
+       	   Notification(`File or folder with name "${file_item.file.name}" already exists`);
            continue;
          }
          let item = {
              'type': 'file',
-             'name': file.name,
+             'name': file_item.file.name,
+	     'item_id': file_item.item_id,
              'parent_id': [currdir],
-             'date_added': file.lastModified,
+             'date_added': file_item.file.lastModified,
          };
+	       console.log(currdir)
        	 setUserFiles(prevUserFiles => [...prevUserFiles, item]);
        	 setExplorer(prevExplorer => [...prevExplorer, item]);
        };
      } else{
        console.log('files is empty')
      }
-	console.log('before forming formdata: ', body)
      const data = await window.makeRequest('UploadFiles', body, files)
      try{
        if (data.status === 25){
          Notification("Upload is done")
        } else if(data.status === 18){
 	 Notification(data.msg)
-	 files.forEach(name =>{
-	   deleteItemFromFiles(name)
+	 files.forEach(file_item =>{
+	   deleteItemFromFiles(file_item.item_id)
 	 });
        } else if (data.status === 13){
-         const foundFolder = userFiles.find(item => item.folder_id === currdir).name
+         const foundFolder = userFiles.find(item => item.item_id[0] === currdir).name
          Notification(`Folder ${foundFolder} does not exists`)
-	 files.forEach(name =>{
-	   deleteItemFromFiles(name)
+	 files.forEach(file_item =>{
+	   deleteItemFromFiles(file_item.item_id)
 	 });
        }
      } catch(error){
 	console.log(error)
-	files.forEach(file =>{
-	  deleteItemFromFiles(file.name)
+	files.forEach(file_item =>{
+	  deleteItemFromFiles(file_item.item_id)
 	});
      }
      setFiles([])
@@ -164,7 +164,8 @@ function DropZone(){
   const changeDirectory = useCallback(() => {
     let	newExplorer = userFiles.filter(item => item.parent_id.includes(currdir));
     setExplorer(newExplorer)
-//    const foundItem = userFiles.find(item => item.folder_id === currdir);
+    console.log(files)
+//    const foundItem = userFiles.find(item => item.item_id === currdir);
 //    if (foundItem){
 //      console.log(`set dir to`, foundItem.name)
 //    }
@@ -177,8 +178,13 @@ function DropZone(){
 
 
   const onDrop = useCallback(acceptedFiles => {
-    setFiles(acceptedFiles);
+      const filesWithItemId = acceptedFiles.map(file => ({
+          file: file,
+          item_id: uuidv4(),
+      }));
+      setFiles(filesWithItemId);
   }, []);
+
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
@@ -194,10 +200,10 @@ function DropZone(){
       </div>}
         <aside>
           <ul id="files-map">
-            {files.map((file, index) => (
-              <li key={file.path}>
+            {files.map((file_item, index) => (
+              <li key={file_item.file.path}>
                 <button className="file-remove-btn" onClick={() => removeFileFromInput(index)}>x</button>
-                <h5>{file.name}</h5>
+                <h5>{file_item.file.name}</h5>
               </li>
             ))}
           </ul>
@@ -222,14 +228,14 @@ function DropZone(){
      	    }}
      	  />
 	  {currdir !== null && <button className="prevFolder" onClick={() => {
-             let foundItem = userFiles.find(item => item.folder_id === currdir);
+             let foundItem = userFiles.find(item => item.item_id[0] === currdir);
              let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
 	  }}>prev</button>}
 	  <div className="explorer">
 	    {explorer.length > 0 ? (
 	      explorer.map((item, index) => (
-	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.folder_id)}>{item.name}</button>)
+	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id[0])}>{item.name}</button>)
 		   :(<span key={item.id || index}>
 		         <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 			 <button className="download-files" onClick={() => {
@@ -265,12 +271,12 @@ function DropZone(){
   };
 
 
-  function deleteItemFromFiles(nameToRemove){
+  function deleteItemFromFiles(ItemIdToRemove){
     setUserFiles((currentFiles) => {
-      return currentFiles.filter((item) => item.name !== nameToRemove);
+      return currentFiles.filter((item) => item.item_id !== ItemIdToRemove);
     });
     setExplorer((currentFiles) => {
-      return currentFiles.filter((item) => item.name !== nameToRemove);
+      return currentFiles.filter((item) => item.item_id!== ItemIdToRemove);
     });
   };
 

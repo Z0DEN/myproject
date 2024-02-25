@@ -62,11 +62,16 @@ function DropZone(){
 	'parent_id': currdir,
      };
      const data = await window.makeRequest('CreateFolder', body);
-     if (data.status !== 24){
+     try{
+       if (data.status !== 24){
+          deleteItemFromFiles(item_id)
+          Notification(data.msg)
+       }
+       Notification(`Created folder "${name}"`)
+     } catch(error){
         deleteItemFromFiles(item_id)
-        Notification(data.msg)
+	console.log(error)
      }
-     Notification(`Created folder "${name}"`)
   };
 
 

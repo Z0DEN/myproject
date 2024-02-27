@@ -54,11 +54,13 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
      headers: headers,
      body: bodyData,
    });
-   const contentType = await response.headers.get('Content-Type')
-   console.log(contentType)
-   data = await response.json()
-   console.log(data)
-   status = data.status 
+   const isFiles = response.headers.get('isFiles');
+	 console.log(isFiles);
+   if (isFiles){
+      return response;
+   }
+   const data = await response.json();
+   const status = data.status;
    if (status == 14 || status == 15 || status == "null"){
      upd_tokens_status = await updateTokens();
      if (upd_tokens_status > 20){

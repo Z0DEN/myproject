@@ -20,7 +20,7 @@ function DropZone(){
         setShowNotification(true);
         const timer = setTimeout(() => {
           setShowNotification(false);
-        }, 5000);
+        }, 3000);
         return () => {
           clearTimeout(timer);
         };
@@ -126,8 +126,9 @@ function DropZone(){
   }
 
 
-  async function downloadFiles(file_name){
-     let body = {'file_name': file_name}
+  async function downloadFiles(item_id, file_name){
+     let body = {'item_id': item_id}
+     try{
      const response = await window.makeRequest('DownloadFiles', body)
 //     const jsonString = JSON.stringify(response);
 //     const blob = new Blob([jsonString], {type: "application/json"});
@@ -141,6 +142,9 @@ function DropZone(){
      document.body.appendChild(a);
      a.click();
      window.URL.revokeObjectURL(url);
+     } catch(error){
+         console.log(error)
+     } 
   }
 
 
@@ -245,7 +249,7 @@ function DropZone(){
 		   :(<span key={item.id || index}>
 		         <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 			 <button className="download-files" onClick={() => {
-				 downloadFiles(item.name)
+				 downloadFiles(item.item_id, item.name)
 			 }}>*</button>
 	  	     </span>
 		   )

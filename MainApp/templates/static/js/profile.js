@@ -55,7 +55,6 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
      body: bodyData,
    });
    const isFiles = response.headers.get('isFiles');
-	 console.log(isFiles);
    if (isFiles){
       return response;
    }

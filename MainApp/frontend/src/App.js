@@ -242,25 +242,28 @@ function DropZone(){
              let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
 	  }}>prev</button>}
-	  <div className="explorer">
-	    {explorer.length > 0 ? (
-	      explorer.map((item, index) => (
-	          item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>)
-		   :(<span key={item.id || index}>
-		         <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
-			 <button className="download-files" onClick={() => {
-				 downloadFiles(item.item_id, item.name)
-			 }}>*</button>
-	  	     </span>
-		   )
-	      ))
-	    ) : isGetData === true && currdir === null ? (
-	      <h3>"Create your first folder or add a file!"</h3>
-	    ) : isGetData === true && currdir !== null ? (
-	      <h3>"Folder is empty"</h3>
-	    ) : (
-	      <h3>"Getting your data"</h3>
-	    )}
+	  <div className="explorer-container">
+	    <div className="explorer">
+	      {explorer.length > 0 ? (
+	        explorer.map((item, index) => (
+	            item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>)
+	             :(<span key={item.id || index}>
+	                   <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
+	          	 <button className="download-files" onClick={() => {
+	          		 downloadFiles(item.item_id, item.name)
+	          	 }}>*</button>
+	    	     </span>
+	             )
+	        ))
+	      ) : isGetData === true && currdir === null ? (
+	        <h3>"Create your first folder or add a file!"</h3>
+	      ) : isGetData === true && currdir !== null ? (
+	        <h3>"Folder is empty"</h3>
+	      ) : (
+	        <h3>"Getting your data"</h3>
+	      )}
+	    </div>
+	    <div className="explorer-options"></div>
 	  </div>
 	    {showNotification && <h3 className="Notification">{notificationText}</h3>}
      	</div>

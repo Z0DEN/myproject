@@ -60,7 +60,7 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
    }
    const data = await response.json();
    const status = data.status;
-   if (status == 14 || status == 15 || status == "null"){
+   if (status == 14 || status == 15 || status == null){
      upd_tokens_status = await updateTokens();
      if (upd_tokens_status > 20){
         return await makeRequest(func, body, files);

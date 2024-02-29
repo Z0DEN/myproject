@@ -172,9 +172,9 @@ function DropZone(){
   }, []);
 
 
-  const changeDirectory = useCallback(() => {
-    let	newExplorer = userFiles.filter(item => item.parent_id.includes(currdir));
-    setExplorer(newExplorer)
+  const changeDirectory = useCallback(async () => {
+    let	newExplorer = await userFiles.filter(item => item.parent_id.includes(currdir));
+    setExplorer(newExplorer);
 //    const foundItem = userFiles.find(item => item.item_id === currdir);
 //    if (foundItem){
 //      console.log(`set dir to`, foundItem.name)

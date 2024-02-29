@@ -14,9 +14,14 @@ body {
     background-attachment: fixed;
 }
 
-@media (min-device-width: 800px) {
+@media screen and (min-width: 600px) {
 body {
     overflow: hidden;
+ }
+
+.explorer-container {
+   display: grid;
+   grid-template-columns: 5fr 2fr;
  }
 }
 
@@ -24,20 +29,15 @@ body {
    display: flex;
    flex-direction: column;
 }
-@media (min-width: 2500px) {
-.explorer-container {
-   display: grid;
-   grid-template-columns: 5fr 2fr;
-}
-}
 
-@media (max-width: 2500px) {
+@media screen and (max-width: 600px) {
 .explorer-container {
    display: grid;
    grid-template-columns: 1fr;
    grid-auto-rows: minmax(100px, auto);
+ }
 }
-}
+
 .explorer {
    border: 0.6vh dashed #ddc2c2;
    border-radius: 4vh;

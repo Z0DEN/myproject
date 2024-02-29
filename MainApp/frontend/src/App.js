@@ -200,14 +200,7 @@ function DropZone(){
 
   return (
     <div>
-      {files.length === 0 && <div {...getRootProps()} id="drop-zone">
-        <input {...getInputProps()} />
-        {isDragActive ? (
-          <h3>Drop the files here ...</h3>
-        ) : (
-          <h3>Drag 'n' drop some files here, or click to select files</h3>
-        )}
-      </div>}
+  <div className="explorer-options"></div>
         <aside>
           <ul id="files-map">
             {files.map((file_item, index) => (
@@ -263,7 +256,14 @@ function DropZone(){
 	        <h3>"Getting your data"</h3>
 	      )}
 	    </div>
-	    <div className="explorer-options"></div>
+            {files.length === 0 && <div {...getRootProps()} id="drop-zone">
+              <input {...getInputProps()} />
+              {isDragActive ? (
+                <h3>Drop the files here ...</h3>
+              ) : (
+                <h3>Drag 'n' drop some files here, or click to select files</h3>
+              )}
+            </div>}
 	  </div>
 	    {showNotification && <h3 className="Notification">{notificationText}</h3>}
      	</div>

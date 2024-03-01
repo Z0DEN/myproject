@@ -199,8 +199,66 @@ function DropZone(){
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
-    <div>
-  <div className="explorer-options"></div>
+    <div className="explorer-container">
+	
+	<div className="explorer">
+	  {explorer.length > 0 ? (
+	    explorer.map((item, index) => (
+	        item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>)
+	         :(<span key={item.id || index}>
+	               <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
+	      	 <button className="download-files" onClick={() => {
+	      		 downloadFiles(item.item_id, item.name)
+	      	 }}>*</button>
+		     </span>
+	         )
+	    ))
+	  ) : isGetData === true && currdir === null ? (
+	    <h3>"Create your first folder or add a file!"</h3>
+	  ) : isGetData === true && currdir !== null ? (
+	    <h3>"Folder is empty"</h3>
+	  ) : (
+	    <h3>"Getting your data"</h3>
+	  )}
+	</div>
+	  
+
+  	<div className="options">
+
+	  <div className="user-info">
+	    <h1>{window.username}</h1>
+            <button onclick="logout()" id="logout-btn">Logout</button>
+	  </div>
+
+	  <div className="file-info"></div>
+
+          {files.length === 0 && <div {...getRootProps()} id="drop-zone">
+            <input {...getInputProps()} />
+            {isDragActive ? (
+              <h3>Drop the files here ...</h3>
+            ) : (
+              <h3>Drag 'n' drop some files here, or click to select files</h3>
+            )}
+          </div>}
+	
+     	  <div>
+     	    <input
+     	      type="text"
+     	      id="folder-input"
+     	      name="folder"
+     	      placeholder="enter a folder name"
+     	      onKeyDown={event => {
+     	        if (event.key === 'Enter') {
+     	          event.preventDefault();
+     	          createFolder(event.target.value);
+     	        }
+     	      }}
+     	    />
+	  </div>
+
+     	</div>
+
+
         <aside>
           <ul id="files-map">
             {files.map((file_item, index) => (
@@ -211,62 +269,22 @@ function DropZone(){
             ))}
           </ul>
         </aside>
+	
 	  { files.length > 0 &&(
 	     <>
 	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
 	      <button id="upload-files" onClick={uploadFiles}>upload files</button>
 	     </>
 	  )}
-     	<div>
-     	  <input
-     	    type="text"
-     	    id="folder-input"
-     	    name="folder"
-     	    placeholder="enter a folder name"
-     	    onKeyDown={event => {
-     	      if (event.key === 'Enter') {
-     	        event.preventDefault();
-     	        createFolder(event.target.value);
-     	      }
-     	    }}
-     	  />
+
+
 	  {currdir !== null && <button className="prevFolder" onClick={() => {
              let foundItem = userFiles.find(item => item.item_id === currdir);
              let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
 	  }}>prev</button>}
-	  <div className="explorer-container">
-	    <div className="explorer">
-	      {explorer.length > 0 ? (
-	        explorer.map((item, index) => (
-	            item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>)
-	             :(<span key={item.id || index}>
-	                   <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
-	          	 <button className="download-files" onClick={() => {
-	          		 downloadFiles(item.item_id, item.name)
-	          	 }}>*</button>
-	    	     </span>
-	             )
-	        ))
-	      ) : isGetData === true && currdir === null ? (
-	        <h3>"Create your first folder or add a file!"</h3>
-	      ) : isGetData === true && currdir !== null ? (
-	        <h3>"Folder is empty"</h3>
-	      ) : (
-	        <h3>"Getting your data"</h3>
-	      )}
-	    </div>
-            {files.length === 0 && <div {...getRootProps()} id="drop-zone">
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <h3>Drop the files here ...</h3>
-              ) : (
-                <h3>Drag 'n' drop some files here, or click to select files</h3>
-              )}
-            </div>}
-	  </div>
-	    {showNotification && <h3 className="Notification">{notificationText}</h3>}
-     	</div>
+	  
+	  {showNotification && <h3 className="Notification">{notificationText}</h3>}
     </div>
   );
 

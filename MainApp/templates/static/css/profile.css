@@ -50,6 +50,8 @@ body {
 
  .drop-zone-container {
     height: 30vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
  }
 }
 

@@ -223,7 +223,6 @@ function DropZone(){
 	  
 
   	<div className="options">
-
 	  <div className="user-info">
 	    <h1>{window.username}</h1>
             <button onclick="logout()" id="logout-btn">Logout</button>
@@ -250,12 +249,13 @@ function DropZone(){
             </ul>
           </div>
 	
-     	  <div>
+	  <div>
      	    <input
      	      type="text"
      	      id="folder-input"
      	      name="folder"
      	      placeholder="enter a folder name"
+	      disabled={!isGetData}
      	      onKeyDown={event => {
      	        if (event.key === 'Enter') {
      	          event.preventDefault();
@@ -278,9 +278,8 @@ function DropZone(){
 	     </>
 	  )}
 
+          {showNotification && <h3 className="Notification">{notificationText}</h3>}
      	</div>
-	  
-	  {showNotification && <h3 className="Notification">{notificationText}</h3>}
       </>	
   );
 

@@ -199,7 +199,7 @@ function DropZone(){
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
-      <>	
+      <>
 	<div className="explorer">
 	  {explorer.length > 0 ? (
 	    explorer.map((item, index) => (
@@ -230,15 +230,25 @@ function DropZone(){
 	  </div>
 
 	  <div className="file-info"></div>
+          <div className="drop-zone-container">
+            {files.length === 0 && <div {...getRootProps()} id="drop-zone">
+              <input {...getInputProps()} />
+              {isDragActive ? (
+                <h3>Drop the files here ...</h3>
+              ) : (
+                <h3>Drag 'n' drop some files here, or click to select files</h3>
+              )}
+            </div>}
 
-          {files.length === 0 && <div {...getRootProps()} id="drop-zone">
-            <input {...getInputProps()} />
-            {isDragActive ? (
-              <h3>Drop the files here ...</h3>
-            ) : (
-              <h3>Drag 'n' drop some files here, or click to select files</h3>
-            )}
-          </div>}
+            <ul id="files-map">
+              {files.map((file_item, index) => (
+                <li key={file_item.file.path}>
+                  <button className="file-remove-btn" onClick={() => removeFileFromInput(index)}>x</button>
+                  <h5>{file_item.file.name}</h5>
+                </li>
+              ))}
+            </ul>
+          </div>
 	
      	  <div>
      	    <input
@@ -255,20 +265,12 @@ function DropZone(){
      	    />
 	  </div>
 
-     	</div>
+	  {currdir !== null && <button className="prevFolder" onClick={() => {
+             let foundItem = userFiles.find(item => item.item_id === currdir);
+             let prevFolder = foundItem ? foundItem.parent_id[0] : null;
+	     setCurrdir(prevFolder)
+	  }}>prev</button>}
 
-
-        <aside>
-          <ul id="files-map">
-            {files.map((file_item, index) => (
-              <li key={file_item.file.path}>
-                <button className="file-remove-btn" onClick={() => removeFileFromInput(index)}>x</button>
-                <h5>{file_item.file.name}</h5>
-              </li>
-            ))}
-          </ul>
-        </aside>
-	
 	  { files.length > 0 &&(
 	     <>
 	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
@@ -276,12 +278,7 @@ function DropZone(){
 	     </>
 	  )}
 
-
-	  {currdir !== null && <button className="prevFolder" onClick={() => {
-             let foundItem = userFiles.find(item => item.item_id === currdir);
-             let prevFolder = foundItem ? foundItem.parent_id[0] : null;
-	     setCurrdir(prevFolder)
-	  }}>prev</button>}
+     	</div>
 	  
 	  {showNotification && <h3 className="Notification">{notificationText}</h3>}
       </>	

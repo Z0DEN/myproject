@@ -50,6 +50,9 @@ body {
     backdrop-filter: blur( 6px );
     -webkit-backdrop-filter: blur( 6px );
     border-radius: 4vh;
+    grid-row-gap: 2vh;
+    display: flex;
+    flex-direction: column;
  }
 
  .options {
@@ -105,6 +108,31 @@ body {
  .drop-zone-container {
     height: auto;
  }
+}
+
+.explorer > span {
+   display: grid;
+   background-color: rebeccapurple;
+   padding-left: 10px;
+   justify-content: space-around;
+   align-items: center;
+   box-sizing: border-box;
+   border: solid whitesmoke;
+   border-radius: 20px;
+   font-size: 1.4rem;
+   grid-template-columns: repeat(3, min-content);
+   grid-template-rows: repeat(3, 2vh);
+   grid-column-gap: 3vw;
+}
+
+.explorer > span > h5 {
+   grid-row-start: 2;
+   grid-column-start: 1;
+}
+
+.explorer > span > button {
+   grid-row-start: 2;
+   grid-column-start: 2;
 }
 
 .user-info {
@@ -185,3 +213,4 @@ body {
    z-index: 1000;
 
 }
+

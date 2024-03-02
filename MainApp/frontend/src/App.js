@@ -199,8 +199,7 @@ function DropZone(){
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
-    <div className="explorer-container">
-	
+      <>	
 	<div className="explorer">
 	  {explorer.length > 0 ? (
 	    explorer.map((item, index) => (
@@ -285,7 +284,7 @@ function DropZone(){
 	  }}>prev</button>}
 	  
 	  {showNotification && <h3 className="Notification">{notificationText}</h3>}
-    </div>
+      </>	
   );
 
 // <a href={`https://node2.whoole.space:8002/media/${window.username}/${item.name}`}>open {item.name}</a>

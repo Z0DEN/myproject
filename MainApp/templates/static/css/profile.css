@@ -5,8 +5,7 @@
 }
 
 body {
-    height: 100vh;
-    background-image: url("../images/background.webp");
+    height: 100vh; background-image: url("../images/background.webp");
     background-color:#130128;
     color: #B970F6;
     background-size: cover;
@@ -19,24 +18,35 @@ body {
     overflow: hidden;
  }
 
-.explorer-container {
-   display: grid;
-   grid-template-columns: 5fr 2fr;
-   grid-auto-rows: 1vh;
-   grid-column-gap: 2vw;
-   padding: 10px;
+#root {
+  display: grid;
+  grid-template-columns: 5fr 2fr;
+  grid-column-gap: 2vw;
+  box-sizing: border-box;
+  padding: 10px;
+  height: 100%;
  }
 }
 
+@media screen and (max-width: 600px) {
 #root {
-  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  grid-row-gap: 0.5vh;
+  box-sizing: border-box;
+  padding: 10px;
+  height: 100%;
+ }
 }
 
 .explorer {
    grid-column-start: 1;
    grid-row-start: 1;
-   border: 0.6vh dashed #ddc2c2;
+   grid-row-end: 3;
+   border: 3px dashed #ddc2c2;
    border-radius: 4vh;
+   box-sizing: border-box;
+   padding: 1vw;
    color: #e9cdcd;
-   height: 96vh;
 }

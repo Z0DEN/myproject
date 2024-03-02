@@ -219,13 +219,19 @@ function DropZone(){
 	  ) : (
 	    <h3>"Getting your data"</h3>
 	  )}
+
+	  {currdir !== null && <button id="prev-btn" onClick={() => {
+             let foundItem = userFiles.find(item => item.item_id === currdir);
+             let prevFolder = foundItem ? foundItem.parent_id[0] : null;
+	     setCurrdir(prevFolder)
+	  }}>prev</button>}
 	</div>
 	  
 
   	<div className="options">
 	  <div className="user-info">
 	    <h1>{window.username}</h1>
-            <button onclick="logout()" id="logout-btn">Logout</button>
+            <button onClick={() => window.logout()} id="logout-btn">Logout</button>
 	  </div>
 
 	  <div className="file-info"></div>
@@ -249,27 +255,19 @@ function DropZone(){
             </ul>
           </div>
 	
-	  <div>
-     	    <input
-     	      type="text"
-     	      id="folder-input"
-     	      name="folder"
-     	      placeholder="enter a folder name"
-	      disabled={!isGetData}
-     	      onKeyDown={event => {
-     	        if (event.key === 'Enter') {
-     	          event.preventDefault();
-     	          createFolder(event.target.value);
-     	        }
-     	      }}
-     	    />
-	  </div>
-
-	  {currdir !== null && <button className="prevFolder" onClick={() => {
-             let foundItem = userFiles.find(item => item.item_id === currdir);
-             let prevFolder = foundItem ? foundItem.parent_id[0] : null;
-	     setCurrdir(prevFolder)
-	  }}>prev</button>}
+     	  <input
+     	    type="text"
+     	    id="folder-input"
+     	    name="folder"
+     	    placeholder="enter a folder name"
+	    disabled={!isGetData}
+     	    onKeyDown={event => {
+     	      if (event.key === 'Enter') {
+     	        event.preventDefault();
+     	        createFolder(event.target.value);
+     	      }
+     	    }}
+     	  />
 
 	  { files.length > 0 &&(
 	     <>

@@ -16,8 +16,6 @@ body {
 #root > div > div {
    background: rgba( 104, 21, 101, 0.2 );
    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-   backdrop-filter: blur( 6px );
-   -webkit-backdrop-filter: blur( 6px );
    border-radius: 4vh;
 }
 
@@ -33,6 +31,11 @@ body {
     box-sizing: border-box;
     padding: 10px;
     height: 100%;
+ }
+
+ #root > div > div {
+    backdrop-filter: blur( 6px );
+    -webkit-backdrop-filter: blur( 6px );
  }
 
  .explorer {
@@ -86,15 +89,18 @@ body {
  .explorer {
     grid-row-start: 2;
     border: 3px dashed #ddc2c2;
-    border-radius: 4vh;
     box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: scroll;
     padding: 1vw;
     color: #e9cdcd;
-    background: rgba( 128, 28, 117, 0.2 );
+    background: rgba( 104, 21, 101, 0.2 );
     box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-    backdrop-filter: blur( 6px );
-    -webkit-backdrop-filter: blur( 6px );
     border-radius: 4vh;
+    grid-row-gap: 2vh;
+    display: flex;
+    flex-direction: column;
+    height: 500px
  }
 
  .options {
@@ -112,28 +118,52 @@ body {
 
 .explorer > span {
    display: grid;
-   background-color: rebeccapurple;
-   padding-left: 10px;
+   gap: 10px;
    justify-content: space-around;
-   align-items: center;
-   box-sizing: border-box;
+   font-size: 1.4rem;
    border: solid whitesmoke;
    border-radius: 20px;
-   font-size: 1.4rem;
-   grid-template-columns: repeat(3, min-content);
-   grid-template-rows: repeat(3, 2vh);
-   grid-column-gap: 3vw;
+   background-color: rebeccapurple;
+   padding-top: 10px;
+   padding-bottom: 10px;
+   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 }
 
-.explorer > span > h5 {
-   grid-row-start: 2;
-   grid-column-start: 1;
+.file-name {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   padding-left: 10px;
+   word-wrap: anywhere;
+   width: 100%;
+}
+
+.file-options {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   padding-left: 10px;
+   justify-content: space-evenly;
+   width: 100%;
+}
+
+.explorer-file {
+   white-space: normal;
+}
+
+.download-file,
+.open-file,
+.delete-file {
+   flex-basis: auto;
+}
+
+/*.explorer > span > h5 {
+   width: max-content;
 }
 
 .explorer > span > button {
-   grid-row-start: 2;
-   grid-column-start: 2;
-}
+   width: max-content;
+}*/
 
 .user-info {
    display: flex;
@@ -163,6 +193,11 @@ body {
 #drop-zone {
    height: 100%;
    padding: 20px;
+   display: flex;
+}
+
+#drop-zone h3 {
+   margin: auto;
 }
 
 #drop-zone:hover {

@@ -203,13 +203,25 @@ function DropZone(){
 	<div className="explorer">
 	  {explorer.length > 0 ? (
 	    explorer.map((item, index) => (
-	        item.type === "folder" ? (<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>)
-	         :(<span key={item.id || index}>
-	               <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
-	      	 <button className="download-files" onClick={() => {
-	      		 downloadFiles(item.item_id, item.name)
-	      	 }}>*</button>
-		     </span>
+	        item.type === "folder" ? (
+		     <div className="folder-item">
+			<img width="48" height="48" src="https://img.icons8.com/color/144/folder-invoices--v1.png" alt="folder-invoices--v1"/>
+		 	<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>
+		     </div>
+		) : (
+		 <span key={item.id || index}>
+		   <span className="file-name">
+		     <img width="48" height="48" src="https://img.icons8.com/fluency/48/file.png" alt="file"/>
+	             <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
+		   </span>
+		   <span className="file-options">
+	      	     <button className="download-file" onClick={() => {
+	      	           downloadFiles(item.item_id, item.name)
+	      	     }}>Скачать</button>
+		     <button className="open-file">Открыть</button>
+		     <button className="delete-file">Удалить</button>
+		   </span>
+		 </span>
 	         )
 	    ))
 	  ) : isGetData === true && currdir === null ? (

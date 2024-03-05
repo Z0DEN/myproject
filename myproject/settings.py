@@ -214,6 +214,9 @@ LOGGING = {
 
 # SITE_DOMAIN = os.environ.get("domain")
 
+existedExtensionsArray = {}
+
 MY_VARIABLES = {
-    "GREETINGS": "HELLO FRIEND"
+    "existedExtensions": existedExtensionsArray,
+    "GREETINGS": "HELLO FRIEND",
 }

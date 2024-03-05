@@ -204,6 +204,7 @@ body {
   cursor: pointer;
 }
 
+/*
 #remove-all-files {
     font-size: 16px;
     text-align: center;
@@ -231,11 +232,23 @@ body {
     border: 1px solid black;
     border-radius: 100%;
     transition: background-color 0.3s ease;
+    padding: 0;
+}
+*/ 
+
+
+@media (hover: hover){
+ button:hover {
+    background-color: #e9cdcd;
+    color: rgb(187, 73, 164);
+ }
 }
 
-.file-remove-btn:hover {
-    background-color: pink;
-    color: red;
+@media (hover: none){
+ button:active {
+    background-color: #e9cdcd;
+    color: rgb(187, 73, 164);
+ }
 }
 
 #prev-btn {
@@ -257,23 +270,21 @@ button{
    color: #e9cdcd;
 }
 
-button:active {
-  animation: scale 150ms ease-in-out;
-  background-color: rgb(179, 56, 154);
-}
-
-@keyframes scale {
-  0% {
-    scale: 100%;
-  }
-  50% {
-    scale: 90%;
-  }
-  100% {
-    scale: 100%;
-  }
-}
-
 .message {
    margin:auto;
+}
+
+#files-map { width: 100%;
+   box-sizing: border-box;
+   padding: 2vh;
+   gap: 10px;
+   display: flex;
+   flex-direction: column;
+   align-items: start;
+}
+
+.input-file-item {
+   display: flex;
+   align-items: flex-start;
+   gap: 2vh;
 }

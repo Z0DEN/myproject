@@ -216,9 +216,8 @@ function DropZone(){
 		) : (
 		 <div key={item.id || index} className="file-item">
 		   <span className="file-name">
-   		     <img width="48" 
-			  height="48" 
-			  <img width="48" height="48" src={`https://whoole.space/static/images/${window.existedExtensions.hasOwnProperty(getFileExtension(item.name)) ? existedExtensions[getFileExtension(item.name)] : "file"}-icon.svg`} alt="file"/>
+   		     <img width="48" height="48" src={`https://whoole.space/static/images/${window.existedExtensions.hasOwnProperty(getFileExtension(item.name)) ? existedExtensions[getFileExtension(item.name)] : "default-file-icon.svg"}`} alt="file"/>
+
 
 	             <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 		   </span>
@@ -327,7 +326,7 @@ function DropZone(){
 
 
   function getFileExtension(filename) {
-    return filename.substring(filename.lastIndexOf('.') +  1);
+    return filename.toLowerCase().substring(filename.lastIndexOf('.') +  1);
   }
 
 };

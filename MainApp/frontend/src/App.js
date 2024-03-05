@@ -205,11 +205,16 @@ function DropZone(){
 	    explorer.map((item, index) => (
 	        item.type === "folder" ? (
 		     <div className="folder-item">
-			<img width="48" height="48" src="https://img.icons8.com/color/144/folder-invoices--v1.png" alt="folder-invoices--v1"/>
-		 	<button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>
+		        <span className="folder-name">
+			   <img width="48" height="48" src="https://img.icons8.com/color/144/folder-invoices--v1.png" alt="folder-invoices--v1"/>
+		 	   <button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>
+			</span>
+		        <span className="folder-options">
+		           <button className="delete-folder">Удалить</button>
+			</span>
 		     </div>
 		) : (
-		 <span key={item.id || index}>
+		 <div key={item.id || index} className="file-item">
 		   <span className="file-name">
 		     <img width="48" height="48" src="https://img.icons8.com/fluency/48/file.png" alt="file"/>
 	             <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
@@ -221,22 +226,22 @@ function DropZone(){
 		     <button className="open-file">Открыть</button>
 		     <button className="delete-file">Удалить</button>
 		   </span>
-		 </span>
+		 </div>
 	         )
 	    ))
 	  ) : isGetData === true && currdir === null ? (
-	    <h3>"Create your first folder or add a file!"</h3>
+	    <h1 className="message">Create your first folder or add a file!</h1>
 	  ) : isGetData === true && currdir !== null ? (
-	    <h3>"Folder is empty"</h3>
+	    <h1 className="message">Folder is empty</h1>
 	  ) : (
-	    <h3>"Getting your data"</h3>
+	    <h1 className="message">Getting your data</h1>
 	  )}
 
 	  {currdir !== null && <button id="prev-btn" onClick={() => {
              let foundItem = userFiles.find(item => item.item_id === currdir);
              let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
-	  }}>prev</button>}
+	  }}>previous folder</button>}
 	</div>
 	  
 
@@ -259,13 +264,20 @@ function DropZone(){
 
             <ul id="files-map">
               {files.map((file_item, index) => (
-                <li key={file_item.file.path}>
+                <span key={file_item.file.path} className="input-file-item">
                   <button className="file-remove-btn" onClick={() => removeFileFromInput(index)}>x</button>
                   <h5>{file_item.file.name}</h5>
-                </li>
+                </span>
               ))}
             </ul>
           </div>
+
+	  { files.length > 0 &&(
+	     <>
+	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
+	      <button id="upload-files" onClick={uploadFiles}>upload files</button>
+	     </>
+	  )}
 	
      	  <input
      	    type="text"
@@ -281,12 +293,6 @@ function DropZone(){
      	    }}
      	  />
 
-	  { files.length > 0 &&(
-	     <>
-	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
-	      <button id="upload-files" onClick={uploadFiles}>upload files</button>
-	     </>
-	  )}
 
           {showNotification && <h3 className="Notification">{notificationText}</h3>}
      	</div>

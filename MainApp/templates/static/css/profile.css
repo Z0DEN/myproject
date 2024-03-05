@@ -7,13 +7,13 @@
 body {
     height: 100vh; background-image: url("../images/background.webp");
     background-color:#130128;
-    color: #B970F6;
     background-size: cover;
+    color: #e9cdcd;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-#root > div > div {
+.options > div{ 
    background: rgba( 104, 21, 101, 0.2 );
    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
    border-radius: 4vh;
@@ -32,8 +32,9 @@ body {
     padding: 10px;
     height: 100%;
  }
-
- #root > div > div {
+ 
+.explorer,
+.options > div {
     backdrop-filter: blur( 6px );
     -webkit-backdrop-filter: blur( 6px );
  }
@@ -47,17 +48,19 @@ body {
     overflow-x: hidden;
     overflow-y: scroll;
     padding: 1vw;
-    color: #e9cdcd;
-    background: rgba( 104, 21, 101, 0.2 );
-    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-    backdrop-filter: blur( 6px );
-    -webkit-backdrop-filter: blur( 6px );
     border-radius: 4vh;
     grid-row-gap: 2vh;
     display: flex;
     flex-direction: column;
  }
 
+ .explorer > div {
+    background: rgba( 104, 21, 101, 0.5 );
+/*
+    background: rgba( 231, 201, 235, 0.6 );      white theme
+    background: rgba( 77, 24, 64, 0.6 );         black theme
+*/ 
+ }
  .options {
     display: flex;
     flex-direction: column-reverse;
@@ -93,7 +96,6 @@ body {
     overflow-x: hidden;
     overflow-y: scroll;
     padding: 1vw;
-    color: #e9cdcd;
     background: rgba( 104, 21, 101, 0.2 );
     box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
     border-radius: 4vh;
@@ -101,6 +103,14 @@ body {
     display: flex;
     flex-direction: column;
     height: 500px
+ }
+
+ .explorer > div {
+    background: rgba( 104, 21, 101, 0.8 );
+/*
+    background: rgba( 231, 201, 235, 0.6 );      white theme
+    background: rgba( 77, 24, 64, 0.6 );         black theme
+*/ 
  }
 
  .options {
@@ -116,54 +126,44 @@ body {
  }
 }
 
-.explorer > span {
+.explorer > div {
    display: grid;
-   gap: 10px;
-   justify-content: space-around;
    font-size: 1.4rem;
-   border: solid whitesmoke;
    border-radius: 20px;
-   background-color: rebeccapurple;
-   padding-top: 10px;
-   padding-bottom: 10px;
-   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 }
 
-.file-name {
-   display: flex;
+.file-item{
+   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.folder-item{
+   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.file-name, .folder-name {
+   display:flex;
+   box-sizing: border-box;
    align-items: center;
    gap: 10px;
-   padding-left: 10px;
+   padding: 10px;
    word-wrap: anywhere;
    width: 100%;
 }
 
-.file-options {
+.file-options, .folder-options {
    display: flex;
    align-items: center;
+   padding: 1vh;
+     padding-left: 1vh;
+   padding-left: 0;
    gap: 10px;
-   padding-left: 10px;
-   justify-content: space-evenly;
    width: 100%;
+   box-sizing: border-box;
 }
 
-.explorer-file {
-   white-space: normal;
-}
 
-.download-file,
-.open-file,
-.delete-file {
-   flex-basis: auto;
-}
 
-/*.explorer > span > h5 {
-   width: max-content;
-}
 
-.explorer > span > button {
-   width: max-content;
-}*/
 
 .user-info {
    display: flex;
@@ -172,15 +172,12 @@ body {
    border: 3px dashed #ddc2c2;
    padding: 20px;
    border-radius: 4vh;
-   color: #e9cdcd;
 }
 
 .drop-zone-container {
   display: flex;
   flex-direction: column;
   border: 3px dashed #ddc2c2;
-  border-radius: 4vh;
-  color: #e9cdcd;
   text-align: center;
   align-items: center;
   font-size: 20px;
@@ -242,10 +239,41 @@ body {
 }
 
 #prev-btn {
-   position: fixed;
-   top: 10px; 
+   position: sticky;
+   align-self: flex-start;
+   bottom: 10px; 
    right: 10px;
-   z-index: 1000;
-
+   margin-top: auto;
 }
 
+button{
+   background-color: rgb(187, 73, 164);
+   border-radius: 10px;
+   z-index: 500;
+   border: solid #e27ae6 2px;
+   font-size: 1.2rem;
+   width: inherit;
+   padding: 1vh;
+   color: #e9cdcd;
+}
+
+button:active {
+  animation: scale 150ms ease-in-out;
+  background-color: rgb(179, 56, 154);
+}
+
+@keyframes scale {
+  0% {
+    scale: 100%;
+  }
+  50% {
+    scale: 90%;
+  }
+  100% {
+    scale: 100%;
+  }
+}
+
+.message {
+   margin:auto;
+}

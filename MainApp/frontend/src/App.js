@@ -206,7 +206,7 @@ function DropZone(){
 	        item.type === "folder" ? (
 		     <div className="folder-item">
 		        <span className="folder-name">
-			   <img width="48" height="48" src="https://img.icons8.com/color/144/folder-invoices--v1.png" alt="folder-invoices--v1"/>
+			   <img width="48" height="48" src="https://whoole.space/static/images/folder-icon.svg" alt="folder-invoices--v1"/>
 		 	   <button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>
 			</span>
 		        <span className="folder-options">
@@ -216,7 +216,10 @@ function DropZone(){
 		) : (
 		 <div key={item.id || index} className="file-item">
 		   <span className="file-name">
-		     <img width="48" height="48" src="https://img.icons8.com/fluency/48/file.png" alt="file"/>
+   		     <img width="48" 
+			  height="48" 
+			  src={`https://whoole.space/static/images/${getFileExtension(item.name) ? getFileExtension(item.name) : "file"}-icon.svg`} 
+		  	  alt="file"/>
 	             <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 		   </span>
 		   <span className="file-options">

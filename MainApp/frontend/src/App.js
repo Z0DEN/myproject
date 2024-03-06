@@ -246,7 +246,7 @@ function DropZone(){
              let foundItem = userFiles.find(item => item.item_id === currdir);
              let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
-	  }}>previous folder</button>}
+	  }}><svg id="prev-btn-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16l-6-6 6-6"/><path d="M20 21v-7a4 4 0 0 0-4-4H5"/></svg></button>}
 	</div>
 	  
 
@@ -270,7 +270,7 @@ function DropZone(){
             <ul id="files-map">
               {files.map((file_item, index) => (
                 <span key={file_item.file.path} className="input-file-item">
-                  <button className="file-remove-btn" onClick={() => removeFileFromInput(index)}>x</button>
+                  <svg className="file-remove-btn" onClick={() => removeFileFromInput(index)} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 1 22 22" fill="none" stroke="#e25656" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                   <h5>{file_item.file.name}</h5>
                 </span>
               ))}

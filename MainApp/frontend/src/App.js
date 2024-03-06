@@ -218,10 +218,8 @@ function DropZone(){
    		     <img 
 			width="48" 
 			height="48" 
-			src={`https://whoole.space/static/images/${window.existExt.hasOwnProperty(getFileExtension(item.name)) ? window.existExt[getFileExtension(item.name)] : "default-file-icon.svg"}`} 
+			src={`https://whoole.space/static/images/${window.existExt.hasOwnProperty(getFileExtension(item.name)) ? window.existExt[getFileExtension(item.name)] : "undefined-file-icon.svg"}`} 
 			alt="file"/>
-
-
 	             <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 		   </span>
 		   <span className="file-options">

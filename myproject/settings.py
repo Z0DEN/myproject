@@ -219,7 +219,7 @@ existExt = {
    'png': 'image-icon.png', 
    'jpeg': 'image-icon.png',
    'jpg': 'image-icon.png',
-   'webp': 'test-image-icon.svg',
+   'webp': 'image-icon.png',
 # music #
    'bmp': 'music-icon.svg',
    'mp2': 'music-icon.svg',
@@ -227,7 +227,22 @@ existExt = {
    'wav': 'music-icon.svg',
    'flac': 'music-icon.svg',
 # video #
-   'mp4': '',
+   'mp4': 'video-icon.svg',
+# txt #
+   'txt': 'txt-icon.png',
+# docs #
+   'ppt': 'powerpoint-icon.svg',
+   'doc': 'word-icon.svg',
+   'xsl': 'excel-icon.svg',
+   'pptx': 'powerpoint-icon.svg',
+   'docx': 'word-icon.svg',
+   'xslx': 'excel-icon.svg',
+   'odp': 'powerpoint-icon.svg',
+# programming #
+   'py': 'python-icon.svg',
+   'exe': 'script-icon.svg',
+   'sh': 'script-icon.svg',
+# undefined #
 }
 
 MY_VARIABLES = {

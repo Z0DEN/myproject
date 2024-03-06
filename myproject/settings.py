@@ -215,8 +215,19 @@ LOGGING = {
 # SITE_DOMAIN = os.environ.get("domain")
 
 existExt = {
-   'png': 'folder-icon.svg', 
-   'jpeg': 'default-file-icon.svg',
+# image #
+   'png': 'image-icon.png', 
+   'jpeg': 'image-icon.png',
+   'jpg': 'image-icon.png',
+   'webp': 'test-image-icon.svg',
+# music #
+   'bmp': 'music-icon.svg',
+   'mp2': 'music-icon.svg',
+   'mp3': 'music-icon.svg',
+   'wav': 'music-icon.svg',
+   'flac': 'music-icon.svg',
+# video #
+   'mp4': '',
 }
 
 MY_VARIABLES = {

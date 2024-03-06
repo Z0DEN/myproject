@@ -307,5 +307,10 @@ button{
    border: 3px dashed #ddc2c2;
    height: 6vh;
    font-size: larger;
+   color: rgb(83, 2, 67);
+}
+
+.Notification {
    color: rgb(187, 73, 164);
+   font-size: 1.8rem;
 }

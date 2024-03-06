@@ -216,7 +216,7 @@ body {
     cursor: pointer;
  }
 
- .file-remove-btn {
+ .file-remove-btn:hover {
     stroke: rgb(187, 73, 164);
     background-color: #e9cdcd;
  }
@@ -240,7 +240,7 @@ body {
     cursor: pointer;
  }
 
- .file-remove-btn {
+ .file-remove-btn:active {
     stroke: rgb(187, 73, 164);
     background-color: #e9cdcd;
  }

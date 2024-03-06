@@ -267,14 +267,15 @@ function DropZone(){
               )}
             </div>}
 
-            <ul id="files-map">
+	  {files.length > 0 && 
+	    <ul id="files-map">
               {files.map((file_item, index) => (
                 <span key={file_item.file.path} className="input-file-item">
                   <svg className="file-remove-btn" onClick={() => removeFileFromInput(index)} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="1 1 22 22" fill="none" stroke="#e25656" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                   <h5>{file_item.file.name}</h5>
                 </span>
               ))}
-            </ul>
+            </ul>}
           </div>
 
 	  { files.length > 0 &&(

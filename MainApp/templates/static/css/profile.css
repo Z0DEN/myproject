@@ -1,7 +1,9 @@
 * {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+   margin: 0;
+   padding: 0;
+   font-family: Arial, sans-serif;
+   user-select: none;
+   font-weight: bold;
 }
 
 body {
@@ -15,7 +17,6 @@ body {
 
 .options > div{ 
    background: rgba( 104, 21, 101, 0.2 );
-   box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
    border-radius: 4vh;
 }
 
@@ -76,6 +77,11 @@ body {
     overflow-x: hidden;
     overflow-y: scroll;
  }
+
+ #folder-input {
+    backdrop-filter: blur( 6px );
+    height: 9vh;
+ }
 }
 
 @media screen and (max-width: 600px) {
@@ -130,14 +136,7 @@ body {
    display: grid;
    font-size: 1.4rem;
    border-radius: 20px;
-}
-
-.file-item{
    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-.folder-item{
-   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
 }
 
 .file-name, .folder-name {
@@ -154,16 +153,10 @@ body {
    display: flex;
    align-items: center;
    padding: 1vh;
-     padding-left: 1vh;
-   padding-left: 0;
    gap: 10px;
-   width: 100%;
    box-sizing: border-box;
+   flex-wrap: wrap;
 }
-
-
-
-
 
 .user-info {
    display: flex;
@@ -188,9 +181,10 @@ body {
 }
 
 #drop-zone {
-   height: 100%;
-   padding: 20px;
    display: flex;
+   height: 100%;
+   width: -moz-available;
+   padding: 20px;
 }
 
 #drop-zone h3 {
@@ -201,12 +195,12 @@ body {
 @media (hover: hover){
  button:hover {
     background-color: #e9cdcd;
-    color: #e06d6d;
+    color: rgb(187, 73, 164);
  }
 
  button:hover #prev-btn-icon {
     background-color: #e9cdcd;
-    stroke: #e06d6d;
+    stroke: rgb(187, 73, 164);
  }
 
  #drop-zone:hover {
@@ -217,7 +211,7 @@ body {
  }
 
  .file-remove-btn:hover {
-    stroke: rgb(187, 73, 164);
+    stroke: rgb(249, 12, 101);
     background-color: #e9cdcd;
  }
 }
@@ -230,7 +224,7 @@ body {
 
  button:active #prev-btn-icon {
     background-color: #e9cdcd;
-    stroke: #e06d6d;
+    stroke: rgb(187, 73, 164)
  }
 
  #drop-zone:active {
@@ -241,7 +235,7 @@ body {
  }
 
  .file-remove-btn:active {
-    stroke: rgb(187, 73, 164);
+    stroke: rgb(249, 12, 101);
     background-color: #e9cdcd;
  }
 }
@@ -252,9 +246,12 @@ button{
    z-index: 500;
    border: solid #e27ae6 2px;
    font-size: 1.2rem;
-   width: inherit;
    padding: 1vh;
    color: #e9cdcd;
+}
+
+.file-item button, .folder-item button {
+   flex-grow: 1;
 }
 
 .message {
@@ -301,4 +298,14 @@ button{
    bottom: 10px; 
    margin-top: auto;
    box-sizing: border-box;
+}
+
+#folder-input {
+   background: rgba( 104, 21, 101, 0.2 );
+   border-radius: 4vh;
+   text-align: center;
+   border: 3px dashed #ddc2c2;
+   height: 6vh;
+   font-size: larger;
+   color: rgb(187, 73, 164);
 }

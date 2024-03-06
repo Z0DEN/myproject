@@ -1,6 +1,4 @@
 const csrf_cookie = Cookies.get('csrftoken')
-let access_token;
-let response_data;
 
 
 async function updateTokens(){

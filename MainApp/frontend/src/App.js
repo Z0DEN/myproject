@@ -13,7 +13,6 @@ function DropZone(){
   const [showNotification, setShowNotification] = useState(false);
   const [notificationText, setNotificationText] = useState('');
 
-
   const Notification = useCallback((text) => {
     if (text && showNotification === false){
 	setNotificationText(text);
@@ -216,7 +215,11 @@ function DropZone(){
 		) : (
 		 <div key={item.id || index} className="file-item">
 		   <span className="file-name">
-   		     <img width="48" height="48" src={`https://whoole.space/static/images/${window.existedExtensions.hasOwnProperty(getFileExtension(item.name)) ? existedExtensions[getFileExtension(item.name)] : "default-file-icon.svg"}`} alt="file"/>
+   		     <img 
+			width="48" 
+			height="48" 
+			src={`https://whoole.space/static/images/${window.existExt.hasOwnProperty(getFileExtension(item.name)) ? window.existExt[getFileExtension(item.name)] : "default-file-icon.svg"}`} 
+			alt="file"/>
 
 
 	             <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>

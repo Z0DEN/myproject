@@ -240,10 +240,7 @@ def HomeRender(request):
 
 @login_required
 def ProfileRender(request):
-    MY_VARIABLES = settings.MY_VARIABLES
-    context = MY_VARIABLES
-    node_ip = NodeModel.objects.get(node_domain=request.user.node_domain).EX_IP
-    context['NODE_IP'] = node_ip
+    context = settings.MY_VARIABLES
     return render(request, "registration/profile.html", context)
 
 

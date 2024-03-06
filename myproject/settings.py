@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/ """
-import os
+import os, json
 from pathlib import Path
 
 from django.urls import reverse_lazy
@@ -214,9 +214,12 @@ LOGGING = {
 
 # SITE_DOMAIN = os.environ.get("domain")
 
-existedExtensionsList = {"png": "folder-icon.svg"}
+existExt = {
+   'png': 'folder-icon.svg', 
+   'jpeg': 'default-file-icon.svg',
+}
 
 MY_VARIABLES = {
-    "existedExtensions": existedExtensionsList,
+    "existExt": json.dumps(existExt),
     "GREETINGS": "HELLO FRIEND",
 }

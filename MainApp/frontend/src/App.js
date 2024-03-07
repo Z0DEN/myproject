@@ -73,6 +73,23 @@ function DropZone(){
      }
   };
 
+  
+  async function deleteItem(item_id, type, name){
+     let body = {'item_id': item_id, 'item_type': type}
+     const data = await window.makeRequest('DeleteItem', body)
+     try{
+       if (data.status === 20){
+          deleteItemFromFiles(item_id)
+          Notification(`Delete item "${name}"`)
+       }
+       if (data.status === 10){
+          Notification('Error occurs while deleting')
+       }
+     } catch(error) {
+	console.log(error)
+     }
+  }
+
 
   async function uploadFiles(){
      if (files.length > 0){
@@ -209,7 +226,7 @@ function DropZone(){
 		 	   <button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>
 			</span>
 		        <span className="folder-options">
-		           <button className="delete-folder">Удалить</button>
+		           <button onClick={() => deleteItem(item.item_id, 'Folder', item.name)} className="delete-folder">Удалить</button>
 			</span>
 		     </div>
 		) : (
@@ -227,7 +244,7 @@ function DropZone(){
 	      	           downloadFiles(item.item_id, item.name)
 	      	     }}>Скачать</button>
 		     <button className="open-file">Открыть</button>
-		     <button className="delete-file">Удалить</button>
+		     <button onClick={() => deleteItem(item.item_id, 'File', item.name)} className="delete-file">Удалить</button>
 		   </span>
 		 </div>
 	         )

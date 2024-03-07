@@ -7,12 +7,13 @@
 }
 
 body {
-    height: 100vh; background-image: url("../images/background.webp");
-    background-color:#130128;
-    background-size: cover;
-    color: #e9cdcd;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+   height: 100vh; 
+   background-image: url("../images/background.webp");
+   background-color:#130128;
+   background-size: cover;
+   color: #e9cdcd;
+   background-repeat: no-repeat;
+   background-attachment: fixed;
 }
 
 .options > div{ 

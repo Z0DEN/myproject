@@ -238,11 +238,11 @@ existExt = {
    'docx': 'word-icon.svg',
    'xslx': 'excel-icon.svg',
    'odp': 'powerpoint-icon.svg',
+   'pdf': 'pdf-icon.svg',
 # programming #
    'py': 'python-icon.svg',
    'exe': 'script-icon.svg',
    'sh': 'script-icon.svg',
-# undefined #
 }
 
 MY_VARIABLES = {

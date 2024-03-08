@@ -146,10 +146,8 @@ function DropZone(){
      let body = {'item_id': item_id}
      try{
      const response = await window.makeRequest('DownloadFiles', body)
-//     const jsonString = JSON.stringify(response);
-//     const blob = new Blob([jsonString], {type: "application/json"});
      let blob = await response.blob() 
-	  console.log(blob)
+	 console.log(blob)
      const url = window.URL.createObjectURL(blob);
      const a = document.createElement('a');
      a.style.display = 'none';
@@ -226,7 +224,7 @@ function DropZone(){
 		 	   <button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>
 			</span>
 		        <span className="folder-options">
-		           <button onClick={() => deleteItem(item.item_id, 'Folder', item.name)} className="delete-folder">Удалить</button>
+		           <button onClick={() => deleteItem(item.item_id, 'folders', item.name)} className="delete-folder">Удалить</button>
 			</span>
 		     </div>
 		) : (
@@ -243,8 +241,7 @@ function DropZone(){
 	      	     <button className="download-file" onClick={() => {
 	      	           downloadFiles(item.item_id, item.name)
 	      	     }}>Скачать</button>
-		     <button className="open-file">Открыть</button>
-		     <button onClick={() => deleteItem(item.item_id, 'File', item.name)} className="delete-file">Удалить</button>
+		     <button onClick={() => deleteItem(item.item_id, 'files', item.name)} className="delete-file">Удалить</button>
 		   </span>
 		 </div>
 	         )
@@ -294,8 +291,8 @@ function DropZone(){
 
 	  { files.length > 0 &&(
 	     <>
-	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
 	      <button id="upload-files" onClick={uploadFiles}>upload files</button>
+	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
 	     </>
 	  )}
 	

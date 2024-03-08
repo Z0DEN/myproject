@@ -29,7 +29,7 @@ body {
  #root {
     display: grid;
     grid-template-columns: 2fr 5fr;
-    grid-column-gap: 1vw;
+    grid-column-gap: 10px;
     box-sizing: border-box;
     padding: 10px;
     height: 100%;
@@ -68,15 +68,10 @@ body {
     flex-direction: column-reverse;
     gap: 10px;
     grid-column-start: 1;
+    grid-column-end: 1;
     grid-row-start: 1;
     grid-row-end: 3;
     box-sizing: border-box;
- }
-
- .drop-zone-container {
-    height: 30vh;
-    overflow-x: hidden;
-    overflow-y: scroll;
  }
 
  #folder-input {
@@ -122,6 +117,7 @@ body {
 
  .options {
     grid-row-start: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -179,6 +175,9 @@ body {
    user-select: none;
    height: 30vh;
    box-sizing: border-box;
+   height: 30vh;
+   overflow-x: hidden;
+   overflow-y: scroll;
 }
 
 #drop-zone {
@@ -204,6 +203,11 @@ body {
     stroke: rgb(187, 73, 164);
  }
 
+ .delete-folder:hover, .delete-file:hover{
+   background-color: rgb(187, 12, 78);
+   color: #e9cdcd;
+ }
+
  #drop-zone:hover {
     border-color: #eb9e9e;
     color: #e06d6d;
@@ -226,6 +230,10 @@ body {
  button:active #prev-btn-icon {
     background-color: #e9cdcd;
     stroke: rgb(187, 73, 164)
+ }
+
+ .delete-folder:active, .delete-file:active {
+   background-color: rgba(213, 11, 86, 0.8);
  }
 
  #drop-zone:active {
@@ -256,12 +264,14 @@ button{
 }
 
 .message {
+   text-align: center;
    margin:auto;
 }
 
 .file-remove-btn {
    height: 4vh;
    width: 4vh;
+   flex-shrink: 0;
    stroke: #e9cdcd;
    background-color: rgb(187, 73, 164);
    border-radius: 100%;
@@ -269,7 +279,8 @@ button{
    padding: 0;
 }
 
-#files-map { width: 100%;
+#files-map { 
+   width: 100%;
    box-sizing: border-box;
    padding: 2vh;
    gap: 10px;
@@ -283,7 +294,7 @@ button{
    align-items: center;
    gap: 1.5vh;
    font-size: 1.4rem;
-   word-wrap: break-word;
+   word-wrap: anywhere;
 
 }
 
@@ -308,10 +319,16 @@ button{
    border: 3px dashed #ddc2c2;
    height: 6vh;
    font-size: larger;
-   color: rgb(83, 2, 67);
+   color: rgb(29, 0, 111);
 }
 
 .Notification {
    color: rgb(187, 73, 164);
    font-size: 1.8rem;
+   word-wrap: anywhere;
+}
+
+.delete-folder, 
+.delete-file {
+   background: rgba(132, 31, 69, 0.44);
 }

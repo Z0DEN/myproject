@@ -49,7 +49,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-f790b_syh@as9^%j(e290_k8mgsq=7mgznh^g0eu(231#w+j!l"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 # Application definition
@@ -172,9 +172,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "MainApp/templates/static/"),
-]
+STATIC_ROOT = os.path.join(BASE_DIR, "MainApp/templates/static/")
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, "MainApp/templates/static/"),
+#]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

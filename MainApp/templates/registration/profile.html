@@ -13,6 +13,7 @@
 <script>
   var node_domain = "{{ user.node_domain }}";
   var username = "{{ user.username }}";
+  var node_port = "{{ node.objects.get(node_domain=user.node_domain).port }}";
   var existExt = JSON.parse("{{ existExt|escapejs }}");
 </script>
 <body>

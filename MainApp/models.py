@@ -15,7 +15,7 @@ class NodeModel(models.Model):
     IN_IP = models.CharField(max_length=15, unique=True)
     EX_IP = models.CharField(max_length=15, unique=True)
     UUID = models.CharField(max_length=32, unique=True)
-    local_connection = models.CharField(max_length=5, default="False")
+    port = models.CharField(max_length=5, unique=True, default="False")
     node_access_token = models.CharField(max_length=256, default="node_access_token")
     node_refresh_token = models.CharField(max_length=256, default="node_refresh_token")
     secret_key = models.CharField(max_length=64, default="secret_key")

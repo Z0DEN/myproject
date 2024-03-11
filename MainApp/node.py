@@ -14,8 +14,6 @@ def get_token_for_node(UUID):
     issued_at = datetime.utcnow()
     access_expiration = issued_at + timedelta(minutes=30)
     refresh_expiration = issued_at + timedelta(days=5)
-#    access_expiration = issued_at + timedelta(minutes=1)
-#    refresh_expiration = issued_at + timedelta(minutes=2)
 
     refresh_payload = {
         "sub": UUID,
@@ -41,12 +39,7 @@ def UpdateNodeTokens(node):
     print('updating tokens')
     new_local_access_token, new_local_refresh_token, new_secret_key = get_token_for_node(node.UUID)
     
-    if node.local_connection:
-#        url = f"http://{node.IN_IP}:8005/UpdateNodeTokens/"
-        url = f"http://{node.IN_IP}:8002/UpdateNodeTokens/"
-    else:
-#        url = f"http://{node.EX_IP}:8005/UpdateNodeTokens/"
-        url = f"http://{node.IN_IP}:8002/UpdateNodeTokens/"
+    url = f"https://{node.node_domain}.whoole.space:{node.port}/UpdateNodeTokens/"
 
     headers = {
         'Authorization': 'server Bearer ' + node.node_refresh_token
@@ -92,12 +85,7 @@ def SendData(data):
     node = NodeModel.objects.get(UUID=node_UUID)
     access_token = node.node_access_token
     refresh_token = node.node_refresh_token
-    if node.local_connection:
-        url = f"https://{node.node_domain}.whoole.space:8002/{func}/"
-#        url = f"http://{node.IN_IP}:8002/{func}/"
-    else:
-        url = f"https://{node.node_domain}.whoole.space:8002/{func}/"
-#        url = f"http://{node.EX_IP}:8002/{func}/"
+    url = f"https://{node.node_domain}.whoole.space:{node.port}/{func}/"
     headers = {
         'Authorization': 'server Bearer ' + access_token
     }
@@ -155,7 +143,6 @@ def NodeConnection(request):
         existing_values = []
         for key, value in data.items():
             if (
-                key != "local_connection" 
                 and key != "node_access_token"
                 and key != "node_refresh_token"
                 and NodeModel.objects.filter(**{key: value}).exists()
@@ -211,7 +198,7 @@ def NodeConnection(request):
     IN_IP = data.get("IN_IP")
     EX_IP = data.get("EX_IP")
     UUID = data.get("UUID")
-    local_connection = data.get("local_connection")
+    port = data.get("port")
     node_server_access_token = data.get("node_access_token")
     node_server_refresh_token = data.get("node_refresh_token")
     bearer_header = request.headers.get('Authorization')
@@ -225,7 +212,7 @@ def NodeConnection(request):
         or IN_IP is None
         or EX_IP is None
         or UUID is None
-        or local_connection is None
+        or port is None
         or node_server_access_token is None
         or node_server_refresh_token is None
         or bearer_token is None

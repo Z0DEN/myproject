@@ -47,7 +47,7 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
   };
 
  try {
-   let response = await fetch(`https://${node_domain}.whoole.space:8002/${func}/`, {
+   let response = await fetch(`https://${node_domain}.whoole.space:${node_port}/${func}/`, {
      method: 'POST',
      headers: headers,
      body: bodyData,

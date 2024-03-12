@@ -8,12 +8,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}"> 
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.0-rc.1/dist/js.cookie.min.js"></script>
     <script src="{% static 'js/profile.js' %}" defer="defer"></script> 
-    <script src="https://whoole.space/react/static/js/bundle.js" defer="defer"></script> 
+    <script src="{% static 'js/main.cd8f0824.js' %}" defer="defer"></script> 
 </head>
 <script>
   var node_domain = "{{ user.node_domain }}";
   var username = "{{ user.username }}";
-var node_port = "{{ node_port }}";
+  var node_port = "{{ node_port }}";
   var existExt = JSON.parse("{{ existExt|escapejs }}");
 </script>
 <body>

@@ -80,7 +80,7 @@ function DropZone(){
      try{
        if (data.status === 20){
           deleteItemFromFiles(item_id)
-          Notification(`Delete item "${name}"`)
+          Notification(`Deleted "${name}"`)
        }
        if (data.status === 10){
           Notification('Error occurs while deleting')

@@ -143,7 +143,7 @@ def NodeConnection(request):
         existing_values = []
         for key, value in data.items():
             if (
-                and key != "node_access_token"
+                key != "node_access_token"
                 and key != "node_refresh_token"
                 and NodeModel.objects.filter(**{key: value}).exists()
             ):

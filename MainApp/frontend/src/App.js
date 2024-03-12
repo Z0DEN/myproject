@@ -75,6 +75,10 @@ function DropZone(){
 
   
   async function deleteItem(item_id, type, name){
+     let confirmation = window.confirm('Confirm deletion')
+     if (!confirmation){
+	return
+     }
      let body = {'item_id': item_id, 'item_type': type}
      const data = await window.makeRequest('DeleteItem', body)
      try{
@@ -147,7 +151,6 @@ function DropZone(){
      try{
      const response = await window.makeRequest('DownloadFiles', body)
      let blob = await response.blob() 
-	 console.log(blob)
      const url = window.URL.createObjectURL(blob);
      const a = document.createElement('a');
      a.style.display = 'none';

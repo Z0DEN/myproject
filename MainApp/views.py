@@ -241,8 +241,10 @@ def HomeRender(request):
 @login_required
 def ProfileRender(request):
     context = settings.MY_VARIABLES
-    node = Node.objects.get(node_domain=request.user.node_domain)
+    node = NodeModel.objects.get(node_domain=request.user.node_domain)
     context['node_port'] = node.port
+    with open('/output.txt', 'a') as f:
+        print(node, file=f)
     return render(request, "registration/profile.html", context)
 
 

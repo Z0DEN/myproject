@@ -241,6 +241,8 @@ def HomeRender(request):
 @login_required
 def ProfileRender(request):
     context = settings.MY_VARIABLES
+    node = Node.objects.get(node_domain=request.user.node_domain)
+    context['node_port'] = node.port
     return render(request, "registration/profile.html", context)
 
 

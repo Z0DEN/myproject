@@ -12,10 +12,12 @@ function DropZone(){
   const [isGetData, setIsGetData] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationText, setNotificationText] = useState('');
+  const [filesTotalSize, setFilesTotalSize] = useState(0);
+  const [takenSpace, setTakenSpace] = useState(0);
 
   const Notification = useCallback((text) => {
     if (text && showNotification === false){
-	setNotificationText(text);
+	setNotificationText(text.toString());
         setShowNotification(true);
         const timer = setTimeout(() => {
           setShowNotification(false);
@@ -97,6 +99,10 @@ function DropZone(){
 
   async function uploadFiles(){
      if (files.length > 0){
+       if (filesTotalSize > window.availableSpace){
+	  Notification('files size > available space')
+	  return
+       }
        var filesToUpload = [];
        var body = { 'parent_id': currdir }
        for (let i=0; i < files.length; i++) {
@@ -124,6 +130,10 @@ function DropZone(){
      try{
        if (data.status === 25){
          Notification("Upload is done")
+	 setTakenSpace(prevTakenSpace => prevTakenSpace + filesTotalSize);
+       } else if(data.status === 19){
+	 Notification(data.msg)
+	 return
        } else if(data.status === 18){
 	 Notification(data.msg)
 	 files.forEach(file_item => {
@@ -173,7 +183,10 @@ function DropZone(){
         console.log(data.msg, data.status);
         return;
       }
+	console.log(data);
       setUserFiles(data.data);
+      setTakenSpace(data.taken_space);
+      window.availableSpace = data.available_space;
       const rootFiles = data.data.filter(item => item.parent_id.includes(null));
       setExplorer(rootFiles);
       setIsGetData(true);
@@ -182,11 +195,6 @@ function DropZone(){
       Notification("Error occurs while getting your data");
     }
   }, [Notification]);
-
-
-  useEffect(() => {
-    getUserData();
-  }, []);
 
 
   const changeDirectory = useCallback(async () => {
@@ -200,8 +208,19 @@ function DropZone(){
 
 
   useEffect(() => {
+    getUserData();
+  }, []);
+
+
+  useEffect(() => {
       changeDirectory();
     }, [currdir, changeDirectory]);
+
+
+  useEffect(() => {
+      const totalSize = files.reduce((acc, file_item) => acc + file_item.file.size, 0);
+      setFilesTotalSize(totalSize);
+    }, [files]);
 
 
   const onDrop = useCallback(acceptedFiles => {
@@ -268,6 +287,7 @@ function DropZone(){
   	<div className="options">
 	  <div className="user-info">
 	    <h1>{window.username}</h1>
+	    <h3>{formatSizeUnits(takenSpace)}/{formatSizeUnits(window.availableSpace)}</h3>
             <button onClick={() => window.logout()} id="logout-btn">Logout</button>
 	  </div>
 
@@ -294,7 +314,7 @@ function DropZone(){
 
 	  { files.length > 0 &&(
 	     <>
-	      <button id="upload-files" onClick={uploadFiles}>upload files</button>
+	      <button id="upload-files" onClick={uploadFiles}>upload {formatSizeUnits(filesTotalSize)}</button>
 	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
 	     </>
 	  )}
@@ -346,6 +366,23 @@ function DropZone(){
 
   function getFileExtension(filename) {
     return filename.toLowerCase().substring(filename.lastIndexOf('.') +  1);
+  }
+
+
+  function formatSizeUnits(bytes) {
+   if (bytes >= 1073741824) {
+      return (bytes / 1073741824).toFixed(2) + " GB";
+   } else if (bytes >= 1048576) {
+      return (bytes / 1048576).toFixed(2) + " MB";
+   } else if (bytes >= 1024) {
+      return (bytes / 1024).toFixed(2) + " KB";
+   } else if (bytes > 1) {
+      return bytes + " bytes";
+   } else if (bytes === 1) {
+      return bytes + " byte";
+   } else {
+      return "0";
+   }
   }
 
 };

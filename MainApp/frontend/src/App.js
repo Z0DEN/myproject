@@ -76,23 +76,34 @@ function DropZone(){
   };
 
   
-  async function deleteItem(item_id, type, name){
-     let confirmation = window.confirm('Confirm deletion')
+  async function deleteItem(item_id, type, name, size=0){
+     let confirmation = window.confirm('Confirm deletion');
      if (!confirmation){
-	return
+	return;
      }
-     let body = {'item_id': item_id, 'item_type': type}
-     const data = await window.makeRequest('DeleteItem', body)
+
+     if (type === 'Folders'){
+	var totalSize = userFiles.reduce((acc, currentItem) => {
+	   if (currentItem.parent_id.includes(item_id)){
+	      return acc + currentItem.size;
+	   }
+	   return acc;
+	}, 0);
+     }
+
+     let body = {'item_id': item_id, 'item_type': type};
+     const data = await window.makeRequest('DeleteItem', body);
      try{
        if (data.status === 20){
-          deleteItemFromFiles(item_id)
-          Notification(`Deleted "${name}"`)
+          deleteItemFromFiles(item_id);
+          Notification(`Deleted "${name}"`);
+          setTakenSpace(prevTakenSpace => prevTakenSpace - (size === 0 ? totalSize : size));
        }
        if (data.status === 10){
-          Notification('Error occurs while deleting')
+          Notification('Error occurs while deleting');
        }
      } catch(error) {
-	console.log(error)
+	console.log(error);
      }
   }
 
@@ -126,11 +137,13 @@ function DropZone(){
      } else{
        console.log('files is empty')
      }
+     Notification("Files if uploading, don't logout")
      const data = await window.makeRequest('UploadFiles', body, filesToUpload)
      try{
        if (data.status === 25){
          Notification("Upload is done")
 	 setTakenSpace(prevTakenSpace => prevTakenSpace + filesTotalSize);
+    	 setFiles([])
        } else if(data.status === 19){
 	 Notification(data.msg)
 	 return
@@ -152,7 +165,6 @@ function DropZone(){
 	  deleteItemFromFiles(file_item.item_id)
 	});
      }
-     setFiles([])
   }
 
 
@@ -183,10 +195,10 @@ function DropZone(){
         console.log(data.msg, data.status);
         return;
       }
-	console.log(data);
       setUserFiles(data.data);
       setTakenSpace(data.taken_space);
       window.availableSpace = data.available_space;
+
       const rootFiles = data.data.filter(item => item.parent_id.includes(null));
       setExplorer(rootFiles);
       setIsGetData(true);
@@ -262,8 +274,8 @@ function DropZone(){
 		   <span className="file-options">
 	      	     <button className="download-file" onClick={() => {
 	      	           downloadFiles(item.item_id, item.name)
-	      	     }}>Скачать</button>
-		     <button onClick={() => deleteItem(item.item_id, 'files', item.name)} className="delete-file">Удалить</button>
+	      	     }}>Скачать {formatSizeUnits(item.size)}</button>
+		     <button onClick={() => deleteItem(item.item_id, 'files', item.name, item.size)} className="delete-file">Удалить {formatSizeUnits(item.size)}</button>
 		   </span>
 		 </div>
 	         )

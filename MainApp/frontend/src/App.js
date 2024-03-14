@@ -129,6 +129,7 @@ function DropZone(){
 	     'item_id': file_item.item_id,
              'parent_id': [currdir],
              'date_added': file_item.file.lastModified,
+	     'size': file_item.file.size,
          };
        	 setUserFiles(prevUserFiles => [...prevUserFiles, item]);
        	 setExplorer(prevExplorer => [...prevExplorer, item]);

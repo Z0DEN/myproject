@@ -238,10 +238,11 @@ function DropZone(){
 
   
   useEffect(() => {
+   let percent = takenSpace / window.availableSpace * 100;
    if (spaceLineRef.current) {
-      spaceLineRef.current.style.setProperty('--before-width', '50%');
+      spaceLineRef.current.style.setProperty('--before-width', `${percent}%`);
    }
-  }, []);
+  }, [takenSpace]);
 
 
   const onDrop = useCallback(acceptedFiles => {

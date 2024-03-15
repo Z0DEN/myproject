@@ -1,6 +1,6 @@
 //import Cookies from 'js-cookie';
 import { v4 as uuidv4 } from 'uuid';
-import React, { useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState, useRef} from 'react';
 import { useDropzone } from 'react-dropzone';
 
 
@@ -14,6 +14,7 @@ function DropZone(){
   const [notificationText, setNotificationText] = useState('');
   const [filesTotalSize, setFilesTotalSize] = useState(0);
   const [takenSpace, setTakenSpace] = useState(0);
+  const spaceLineRef = useRef(null);
 
   const Notification = useCallback((text) => {
     if (text && showNotification === false){
@@ -76,13 +77,13 @@ function DropZone(){
   };
 
   
-  async function deleteItem(item_id, type, name, size=0){
+  async function deleteItem(item_id, type, name, size=null){
      let confirmation = window.confirm('Confirm deletion');
      if (!confirmation){
 	return;
      }
 
-     if (type === 'Folders'){
+     if (type === 'folders'){
 	var totalSize = userFiles.reduce((acc, currentItem) => {
 	   if (currentItem.parent_id.includes(item_id)){
 	      return acc + currentItem.size;
@@ -97,7 +98,7 @@ function DropZone(){
        if (data.status === 20){
           deleteItemFromFiles(item_id);
           Notification(`Deleted "${name}"`);
-          setTakenSpace(prevTakenSpace => prevTakenSpace - (size === 0 ? totalSize : size));
+          setTakenSpace(prevTakenSpace => prevTakenSpace - (size ? size : totalSize));
        }
        if (data.status === 10){
           Notification('Error occurs while deleting');
@@ -161,7 +162,7 @@ function DropZone(){
 	 });
        }
      } catch(error){
-	console.log(error)
+	Notification('Error: perhaps files size is too big')
 	files.forEach(file_item =>{
 	  deleteItemFromFiles(file_item.item_id)
 	});
@@ -235,6 +236,13 @@ function DropZone(){
       setFilesTotalSize(totalSize);
     }, [files]);
 
+  
+  useEffect(() => {
+   if (spaceLineRef.current) {
+      spaceLineRef.current.style.setProperty('--before-width', '50%');
+   }
+  }, []);
+
 
   const onDrop = useCallback(acceptedFiles => {
       const filesWithItemId = acceptedFiles.map(file => ({
@@ -295,13 +303,15 @@ function DropZone(){
 	     setCurrdir(prevFolder)
 	  }}><svg id="prev-btn-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 16l-6-6 6-6"/><path d="M20 21v-7a4 4 0 0 0-4-4H5"/></svg></button>}
 	</div>
-	  
 
-  	<div className="options">
+        <div className="options">
 	  <div className="user-info">
-	    <h1>{window.username}</h1>
-	    <h3>{formatSizeUnits(takenSpace)}/{formatSizeUnits(window.availableSpace)}</h3>
-            <button onClick={() => window.logout()} id="logout-btn">Logout</button>
+	     <h2>{window.username}</h2>
+	     <span id="space" ref={spaceLineRef}>
+	       <h3>{formatSizeUnits(takenSpace)}/{formatSizeUnits(window.availableSpace)}</h3>
+	       <span id="space-line"></span>
+	     </span>
+	     <button onClick={() => window.logout()} id="logout-btn">Logout</button>
 	  </div>
 
           <div className="drop-zone-container">

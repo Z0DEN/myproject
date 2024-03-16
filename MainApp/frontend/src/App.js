@@ -11,25 +11,39 @@ function DropZone(){
   const [currdir, setCurrdir] = useState(null);
   const [isGetData, setIsGetData] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [notificationText, setNotificationText] = useState('');
+//  const [notificationText, setNotificationText] = useState('');
+  const [notifications, setNotifications] = useState([]);
   const [filesTotalSize, setFilesTotalSize] = useState(0);
   const [takenSpace, setTakenSpace] = useState(0);
   const spaceLineRef = useRef(null);
 
   const Notification = useCallback((text) => {
-    if (text && showNotification === false){
-	setNotificationText(text.toString());
-        setShowNotification(true);
-        const timer = setTimeout(() => {
-          setShowNotification(false);
-        }, 3000);
-        return () => {
-          clearTimeout(timer);
-        };
-    } else{ 
-       return;
-    }
+   if (text) {
+      const timer = setTimeout(() => {
+        setNotifications(prevNotifications => prevNotifications.filter(notification => notification !== text));
+      }, 5000);
+      return () => {
+        clearTimeout(timer);
+      };
+   } else {
+      return;
+   }
   }, [showNotification]);
+
+//  const Notification = useCallback((text) => {
+//    if (text && showNotification === false){
+//	setNotificationText(prevNotification => text.toString() + prevNotification);
+//        setShowNotification(true);
+//        const timer = setTimeout(() => {
+//          setShowNotification(false);
+//        }, 3000);
+//        return () => {
+//          clearTimeout(timer);
+//        };
+//    } else{ 
+//       return;
+//    }
+//  }, [showNotification]);
 
 
   async function createFolder(name){
@@ -111,7 +125,8 @@ function DropZone(){
 
   async function uploadFiles(){
      if (files.length > 0){
-       if (filesTotalSize > window.availableSpace){
+       if (filesTotalSize + takenSpace > window.availableSpace){
+	  console.log(filesTotalSize + takenSpace)
 	  Notification('files size > available space')
 	  return
        }
@@ -119,7 +134,7 @@ function DropZone(){
        var body = { 'parent_id': currdir }
        for (let i=0; i < files.length; i++) {
 	 let file_item = files[i];
-         if (userFiles.some(item => item.name === file_item.file.name && item.parent_id[0] === currdir)){
+         if (userFiles.some(item => item.name === file_item.file.name && item.parent_id.includes(currdir))){
        	   Notification(`File or folder with name "${file_item.file.name}" already exists`);
            continue;
          }
@@ -139,7 +154,10 @@ function DropZone(){
      } else{
        console.log('files is empty')
      }
-     Notification("Files if uploading, don't logout")
+     if (filesToUpload.length === 0) {
+	return;
+     }
+     Notification("Files if uploading, do not logout")
      const data = await window.makeRequest('UploadFiles', body, filesToUpload)
      try{
        if (data.status === 25){
@@ -239,8 +257,10 @@ function DropZone(){
   
   useEffect(() => {
    let percent = takenSpace / window.availableSpace * 100;
+   let backColor = percent < 50 ? 'green' : percent < 90 ? 'orange' : 'red';
    if (spaceLineRef.current) {
       spaceLineRef.current.style.setProperty('--before-width', `${percent}%`);
+      spaceLineRef.current.style.setProperty('--before-back-color', `${backColor}`);
    }
   }, [takenSpace]);
 
@@ -307,7 +327,7 @@ function DropZone(){
 
         <div className="options">
 	  <div className="user-info">
-	     <h2>{window.username}</h2>
+	     <h1>{window.username}</h1>
 	     <span id="space" ref={spaceLineRef}>
 	       <h3>{formatSizeUnits(takenSpace)}/{formatSizeUnits(window.availableSpace)}</h3>
 	       <span id="space-line"></span>
@@ -357,9 +377,16 @@ function DropZone(){
      	    }}
      	  />
 
-	  <div className="file-info"></div>
+	  {notifications.length > 0 && (
+	    <div id="Notification-div">
+	        <ul className="Notification">
+	          {notifications.map((notification, index) => (
+	            <li key={index}>{notification}</li>
+	          ))}
+	        </ul>
+	    </div>
+	  )}
 
-          {showNotification && <h3 className="Notification">{notificationText}</h3>}
      	</div>
       </>	
   );

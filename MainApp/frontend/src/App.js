@@ -10,40 +10,25 @@ function DropZone(){
   const [files, setFiles] = useState([]);
   const [currdir, setCurrdir] = useState(null);
   const [isGetData, setIsGetData] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
-//  const [notificationText, setNotificationText] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [filesTotalSize, setFilesTotalSize] = useState(0);
   const [takenSpace, setTakenSpace] = useState(0);
   const spaceLineRef = useRef(null);
 
-  const Notification = useCallback((text) => {
-   if (text) {
-      const timer = setTimeout(() => {
-        setNotifications(prevNotifications => prevNotifications.filter(notification => notification !== text));
-      }, 5000);
-      return () => {
-        clearTimeout(timer);
-      };
-   } else {
-      return;
-   }
-  }, [showNotification]);
 
-//  const Notification = useCallback((text) => {
-//    if (text && showNotification === false){
-//	setNotificationText(prevNotification => text.toString() + prevNotification);
-//        setShowNotification(true);
-//        const timer = setTimeout(() => {
-//          setShowNotification(false);
-//        }, 3000);
-//        return () => {
-//          clearTimeout(timer);
-//        };
-//    } else{ 
-//       return;
-//    }
-//  }, [showNotification]);
+  const Notification = (text) => {
+    if (text !== ''){ 
+	setNotifications(prevNotifications => [...prevNotifications, text.toString()]);
+        const timer = setTimeout(() => {
+	   setNotifications(prevNotifications => [...prevNotifications.filter(note => note !== text)])
+        }, 10000);
+        return () => {
+          clearTimeout(timer);
+        };
+    } else{ 
+       return;
+    }
+  };
 
 
   async function createFolder(name){
@@ -226,7 +211,7 @@ function DropZone(){
       console.log(error);
       Notification("Error occurs while getting your data");
     }
-  }, [Notification]);
+  }, []);
 
 
   const changeDirectory = useCallback(async () => {

@@ -39,7 +39,7 @@ function DropZone(){
 
      const exists = userFiles.some(item => item.name === name && item.parent_id[0] === currdir);
      if (exists) {
-       Notification(`File folder with name "${name}" already exists`);
+       Notification(`Файл или папка с именем "${name}" уже существует`);
        return;
      }
 

@@ -33,7 +33,7 @@ function DropZone(){
 
   async function createFolder(name){
      if (name === ""){
-        Notification("folder name must be a non-empty string");
+        Notification("Имя папки не должно быть пустым");
         return;
      }
 
@@ -68,7 +68,7 @@ function DropZone(){
           deleteItemFromFiles(item_id)
           Notification(data.msg)
        }
-       Notification(`Created folder "${name}"`)
+       Notification(`Создана папка: "${name}"`)
      } catch(error){
         deleteItemFromFiles(item_id)
 	console.log(error)
@@ -96,11 +96,11 @@ function DropZone(){
      try{
        if (data.status === 20){
           deleteItemFromFiles(item_id);
-          Notification(`Deleted "${name}"`);
+          Notification(`Удалено: "${name}"`);
           setTakenSpace(prevTakenSpace => prevTakenSpace - (size ? size : totalSize));
        }
        if (data.status === 10){
-          Notification('Error occurs while deleting');
+          Notification('Возникла ошибка при удалении');
        }
      } catch(error) {
 	console.log(error);
@@ -112,7 +112,7 @@ function DropZone(){
      if (files.length > 0){
        if (filesTotalSize + takenSpace > window.availableSpace){
 	  console.log(filesTotalSize + takenSpace)
-	  Notification('files size > available space')
+	  Notification('Размер файлов >Доступного метса')
 	  return
        }
        var filesToUpload = [];
@@ -120,7 +120,7 @@ function DropZone(){
        for (let i=0; i < files.length; i++) {
 	 let file_item = files[i];
          if (userFiles.some(item => item.name === file_item.file.name && item.parent_id.includes(currdir))){
-       	   Notification(`File or folder with name "${file_item.file.name}" already exists`);
+       	   Notification(`Файл или папка с именем: "${file_item.file.name}" уже существует`);
            continue;
          }
 	 body[file_item.file.name] = file_item.item_id;
@@ -142,11 +142,11 @@ function DropZone(){
      if (filesToUpload.length === 0) {
 	return;
      }
-     Notification("Files if uploading, do not logout")
+     Notification("Файлы загружаются, не выходите")
      const data = await window.makeRequest('UploadFiles', body, filesToUpload)
      try{
        if (data.status === 25){
-         Notification("Upload is done")
+         Notification("Загрузка завершена")
 	 setTakenSpace(prevTakenSpace => prevTakenSpace + filesTotalSize);
     	 setFiles([])
        } else if(data.status === 19){
@@ -159,13 +159,13 @@ function DropZone(){
 	 });
        } else if (data.status === 13){
          const foundFolder = userFiles.find(item => item.item_id === currdir).name
-         Notification(`Folder ${foundFolder} does not exists`)
+         Notification(`Папка ${foundFolder} не существует`)
 	 files.forEach(file_item => {
 	   deleteItemFromFiles(file_item.item_id)
 	 });
        }
      } catch(error){
-	Notification('Error: perhaps files size is too big')
+	Notification('Ошибка: возможно размер файлов слишком большой')
 	files.forEach(file_item =>{
 	  deleteItemFromFiles(file_item.item_id)
 	});
@@ -209,7 +209,7 @@ function DropZone(){
       setIsGetData(true);
     } catch (error) {
       console.log(error);
-      Notification("Error occurs while getting your data");
+      Notification("Возникла ошибка при получении данных");
     }
   }, []);
 
@@ -326,7 +326,7 @@ function DropZone(){
               {isDragActive ? (
                 <h3>Drop the files here ...</h3>
               ) : (
-                <h3>Drag 'n' drop some files here, or click to select files</h3>
+                <h3>Перетащите сюда файлы или кликните, чтобы выбрать</h3>
               )}
             </div>}
 
@@ -352,7 +352,7 @@ function DropZone(){
      	    type="text"
      	    id="folder-input"
      	    name="folder"
-     	    placeholder="enter a folder name"
+     	    placeholder="Введите название папки"
 	    disabled={!isGetData}
      	    onKeyDown={event => {
      	      if (event.key === 'Enter') {

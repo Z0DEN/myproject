@@ -79,7 +79,6 @@ def UpdateNodeTokens(node):
 
 
 def SendData(data):
-    print('start send data')
     node_UUID = data['node_UUID']
     func = data['func']
     node = NodeModel.objects.get(UUID=node_UUID)
@@ -94,7 +93,6 @@ def SendData(data):
     try:
         response = requests.post(url, data=json.dumps(data), headers=headers)
         status = response.json().get('status')
-        print(status)
     except Exception as e:
         pass
 
@@ -145,6 +143,7 @@ def NodeConnection(request):
             if (
                 key != "node_access_token"
                 and key != "node_refresh_token"
+                and key != "node_available_space"
                 and NodeModel.objects.filter(**{key: value}).exists()
             ):
                 arg_string = f"{key}: {value}"
@@ -199,6 +198,7 @@ def NodeConnection(request):
     EX_IP = data.get("EX_IP")
     UUID = data.get("UUID")
     port = data.get("port")
+    node_available_space = data.get("node_available_space")
     node_server_access_token = data.get("node_access_token")
     node_server_refresh_token = data.get("node_refresh_token")
     bearer_header = request.headers.get('Authorization')
@@ -213,6 +213,7 @@ def NodeConnection(request):
         or EX_IP is None
         or UUID is None
         or port is None
+        or node_available_space is None
         or node_server_access_token is None
         or node_server_refresh_token is None
         or bearer_token is None

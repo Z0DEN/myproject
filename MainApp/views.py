@@ -167,7 +167,7 @@ def Registration(request):
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
-                user.node_domain = node_domain
+                user.node_domain = node.node_domain
                 user.save()
                 login(request, user)
 

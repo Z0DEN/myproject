@@ -171,7 +171,7 @@ def Registration(request):
                 user.save()
                 login(request, user)
 
-                num_users = CloudUser.objects.filter(node_domain=node_domain).count()
+                num_users = CloudUser.objects.filter(node_domain=node.node_domain).count()
                 node.user_quantity = num_users
                 node.save()
 

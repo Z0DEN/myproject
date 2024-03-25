@@ -49,7 +49,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-f790b_syh@as9^%j(e290_k8mgsq=7mgznh^g0eu(231#w+j!l"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 #DATA_UPLOAD_MAX_MEMORY_SIZE = 1000000
 
@@ -239,10 +239,10 @@ existExt = {
 # docs #
     'ppt': 'powerpoint-icon.svg',
     'doc': 'word-icon.svg',
-    'xsl': 'excel-icon.svg',
+    'xls': 'excel-icon.svg',
     'pptx': 'powerpoint-icon.svg',
     'docx': 'word-icon.svg',
-    'xslx': 'excel-icon.svg',
+    'xlsx': 'excel-icon.svg',
     'odp': 'powerpoint-icon.svg',
     'pdf': 'pdf-icon.svg',
 # programming #

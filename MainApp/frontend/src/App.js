@@ -77,7 +77,7 @@ function DropZone(){
 
   
   async function deleteItem(item_id, type, name, size=null){
-     let confirmation = window.confirm('Confirm deletion');
+     let confirmation = window.confirm('Подтвердите удаление...');
      if (!confirmation){
 	return;
      }
@@ -296,11 +296,11 @@ function DropZone(){
 	         )
 	    ))
 	  ) : isGetData === true && currdir === null ? (
-	    <h1 className="message">Create your first folder or add a file!</h1>
+            <h1 className="message">Создайте свою первую папку или добавьте файл!</h1>
 	  ) : isGetData === true && currdir !== null ? (
-	    <h1 className="message">Folder is empty</h1>
+            <h1 className="message">Папка пуста</h1>
 	  ) : (
-	    <h1 className="message">Getting your data</h1>
+            <h1 className="message">Получение данных</h1>
 	  )}
 
 	  {currdir !== null && <button id="prev-btn" onClick={() => {
@@ -317,14 +317,14 @@ function DropZone(){
 	       <h3>{formatSizeUnits(takenSpace)}/{formatSizeUnits(window.availableSpace)}</h3>
 	       <span id="space-line"></span>
 	     </span>
-	     <button onClick={() => window.logout()} id="logout-btn">Logout</button>
+             <button onClick={() => window.logout()} id="logout-btn">Выйти</button>
 	  </div>
 
           <div className="drop-zone-container">
             {files.length === 0 && <div {...getRootProps()} id="drop-zone">
               <input {...getInputProps()} />
               {isDragActive ? (
-                <h3>Drop the files here ...</h3>
+		<h3>Добавить выбранные файлы...</h3>
               ) : (
                 <h3>Перетащите сюда файлы или кликните, чтобы выбрать</h3>
               )}
@@ -343,8 +343,8 @@ function DropZone(){
 
 	  { files.length > 0 &&(
 	     <>
-	      <button id="upload-files" onClick={uploadFiles}>upload {formatSizeUnits(filesTotalSize)}</button>
-	      <button id="remove-all-files" onClick={removeAllFiles}>remove all files</button>
+              <button id="upload-files" onClick={uploadFiles}>Загрузить {formatSizeUnits(filesTotalSize)}</button>
+              <button id="remove-all-files" onClick={removeAllFiles}>Очистить всё</button>
 	     </>
 	  )}
 	

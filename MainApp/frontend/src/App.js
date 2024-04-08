@@ -112,7 +112,7 @@ function DropZone(){
      if (files.length > 0){
        if (filesTotalSize + takenSpace > window.availableSpace){
 	  console.log(filesTotalSize + takenSpace)
-	  Notification('Размер файлов >Доступного метса')
+	  Notification('Размер файлов > доступного места')
 	  return
        }
        var filesToUpload = [];
@@ -144,32 +144,62 @@ function DropZone(){
      }
      Notification("Файлы загружаются, не выходите")
      const data = await window.makeRequest('UploadFiles', body, filesToUpload)
-     try{
-       if (data.status === 25){
-         Notification("Загрузка завершена")
-	 setTakenSpace(prevTakenSpace => prevTakenSpace + filesTotalSize);
-    	 setFiles([])
-       } else if(data.status === 19){
-	 Notification(data.msg)
-	 return
-       } else if(data.status === 18){
-	 Notification(data.msg)
-	 files.forEach(file_item => {
-	   deleteItemFromFiles(file_item.item_id)
-	 });
-       } else if (data.status === 13){
-         const foundFolder = userFiles.find(item => item.item_id === currdir).name
-         Notification(`Папка ${foundFolder} не существует`)
-	 files.forEach(file_item => {
-	   deleteItemFromFiles(file_item.item_id)
-	 });
-       }
+     try {
+	switch(data.status) {
+	   case 25:
+         	Notification("Загрузка завершена");
+	 	setTakenSpace(prevTakenSpace => prevTakenSpace + filesTotalSize);
+    	 	setFiles([]);
+		break;
+	   case 19:
+	 	Notification(data.msg)
+	 	return
+	   case 18:
+	 	Notification(data.msg);
+	 	files.forEach(file_item => {
+	 	  deleteItemFromFiles(file_item.item_id)
+	 	});
+		break;
+	   case 13:
+         	const foundFolder = userFiles.find(item => item.item_id === currdir).name
+         	Notification(`Папка ${foundFolder} не существует`)
+	 	files.forEach(file_item => {
+	 	  deleteItemFromFiles(file_item.item_id)
+	 	});
+		break;
+	}
      } catch(error){
 	Notification('Ошибка: возможно размер файлов слишком большой')
 	files.forEach(file_item =>{
 	  deleteItemFromFiles(file_item.item_id)
 	});
      }
+//     try{
+//       if (data.status === 25){
+//         Notification("Загрузка завершена")
+//	 setTakenSpace(prevTakenSpace => prevTakenSpace + filesTotalSize);
+//    	 setFiles([])
+//       } else if(data.status === 19){
+//	 Notification(data.msg)
+//	 return
+//       } else if(data.status === 18){
+//	 Notification(data.msg)
+//	 files.forEach(file_item => {
+//	   deleteItemFromFiles(file_item.item_id)
+//	 });
+//       } else if (data.status === 13){
+//         const foundFolder = userFiles.find(item => item.item_id === currdir).name
+//         Notification(`Папка ${foundFolder} не существует`)
+//	 files.forEach(file_item => {
+//	   deleteItemFromFiles(file_item.item_id)
+//	 });
+//       }
+//     } catch(error){
+//	Notification('Ошибка: возможно размер файлов слишком большой')
+//	files.forEach(file_item =>{
+//	  deleteItemFromFiles(file_item.item_id)
+//	});
+//     }
   }
 
 

@@ -191,57 +191,10 @@ def Registration(request):
             return render(request, "registration/registration.html", {"form": form})
 
 
-#def Registration(request):
-#    if request.method != "POST":
-#        form = RegisterForm()
-#        return render(request, "registration/registration.html", {"form": form})
-#    else:
-#        form = RegisterForm(request.POST)
-#        if not form.is_valid():
-#            return render(request, "registration/registration.html", {"form": form})
-#        else:
-#            form.save()
-#            username = form.cleaned_data["username"]
-#            password = form.cleaned_data["password1"]
-#
-#            user = authenticate(request, username=username, password=password)
-#
-#            if user is not None:
-#                node = NodeModel.objects.order_by('user_quantity').first()
-#                node_domain = node.node_domain
-#                total_space = sum(u.available_space for u in CloudUser.objects.filter(node_domain=node_domain))
-#                if total_space + 16_106_127_360 > 144_955_146_240:
-#                    return render(request, 'registration/outofspace.html')
-#                user.node_domain = node_domain
-#                user.save()
-#                login(request, user)
-#
-#                num_users = CloudUser.objects.filter(node_domain=node_domain).count()
-#                node.user_quantity = num_users
-#                node.save()
-#
-#                access_token, refresh_token = GetToken(user)
-#                response = HttpResponseRedirect(reverse('MainApp:profile'))
-#                response.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Lax', secure=True)
-#                response.set_cookie('access_token', access_token, httponly=False, samesite='Lax', secure=True)
-#
-#                data_to_send = {
-#                   'username': user.username,
-#                   'node_UUID': node.UUID,
-#                   'func': 'AddUser',
-#                }
-#                SendData(data_to_send)
-#                return response
-
-
 def UserLogin(request):
     form = LoginForm(request.POST or None)
-    context = {
-       'STATUS': True,
-       'form': form
-    }
     if request.method == 'GET':
-        return render(request, 'registration/login.html', context)
+        return render(request, 'registration/login.html', {'form': form})
     if form.is_valid():
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
@@ -258,10 +211,7 @@ def UserLogin(request):
         response.set_cookie('access_token', access_token, httponly=False, samesite='Lax', secure=True)
         return response
     else:
-        context['STATUS'] = False
-        context['ERROR'] = 'Invalid login or password'
-        context['FORM_ERRORS'] = form.errors
-    return render(request, 'registration/login.html', context)
+        return render(request, 'registration/login.html', {'form': form})
 
 
 @login_required

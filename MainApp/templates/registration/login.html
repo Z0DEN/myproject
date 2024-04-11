@@ -15,9 +15,7 @@
           {% csrf_token %}
           {{ form.as_p }}
 	  <button class="form-submit-button" type="submit">Login</button> 
-	  {% if not STATUS %}
-	    <a class="reg-link" href={% url 'MainApp:register' %}>>Registration<</a>
-	  {% endif %}
+	  <a href="/reg">Does not have account yet?</a>
         </form>
     </div>
   </body>

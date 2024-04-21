@@ -242,6 +242,7 @@ existExt = {
     'xls': 'excel-icon.svg',
     'pptx': 'powerpoint-icon.svg',
     'docx': 'word-icon.svg',
+    'odt': 'word-icon.svg',
     'xlsx': 'excel-icon.svg',
     'odp': 'powerpoint-icon.svg',
     'pdf': 'pdf-icon.svg',

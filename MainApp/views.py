@@ -2,7 +2,7 @@ import jwt
 import requests
 import json
 import secrets
-import redis
+import redis 
 import time
 from django_redis import get_redis_connection
 from django.core.cache import cache

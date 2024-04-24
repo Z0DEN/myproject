@@ -206,6 +206,7 @@ function DropZone(){
   async function downloadFiles(item_id, file_name){
      let body = {'item_id': item_id}
      try{
+     Notification("Скачивание файла...")
      const response = await window.makeRequest('DownloadFiles', body)
      let blob = await response.blob() 
      const url = window.URL.createObjectURL(blob);
@@ -219,6 +220,9 @@ function DropZone(){
      document.body.removeChild(a);
      } catch(error){
          console.log(error)
+	 Notification("Скачивание файла было прервано по неизвестной ошибке")
+     } finally {
+         Notification("Скачивание файла завершено")
      } 
   }
 

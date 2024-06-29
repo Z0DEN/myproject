@@ -107,6 +107,16 @@ function DropZone(){
      }
   }
 
+  
+  function moveItem(itemId, fromdir){
+     const new_button = document.createElement('button');
+     new_button.textContent = 'move';
+     let buttonContainer = document.getElementsByClassName('explorer')[0];
+     buttonContainer.appendChild(new_button);
+     new_button.addEventListener('click', () => {
+	 console.log('itemId: ', itemId, 'fromdir: ', fromdir)
+     })
+  }
 
   async function uploadFiles(){
      if (files.length > 0){
@@ -325,6 +335,7 @@ function DropZone(){
 	      	     <button className="download-file" onClick={() => {
 	      	           downloadFiles(item.item_id, item.name)
 	      	     }}>Скачать {formatSizeUnits(item.size)}</button>
+		     <button className="move-file" onClick={() => {moveItem(item.item_id, currdir)}}>move</button>
 		     <button onClick={() => deleteItem(item.item_id, 'files', item.name, item.size)} className="delete-file">Удалить {formatSizeUnits(item.size)}</button>
 		   </span>
 		 </div>

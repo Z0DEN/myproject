@@ -73,7 +73,7 @@ function DropZone(){
         deleteItemFromFiles(item_id)
 	console.log(error)
      }
-  };
+  }
 
   
   async function deleteItem(item_id, type, name, size=null){
@@ -109,12 +109,35 @@ function DropZone(){
 
   
   function moveItem(itemId, fromdir){
-     const new_button = document.createElement('button');
-     new_button.textContent = 'move';
-     let buttonContainer = document.getElementsByClassName('explorer')[0];
-     buttonContainer.appendChild(new_button);
-     new_button.addEventListener('click', () => {
-	 console.log('itemId: ', itemId, 'fromdir: ', fromdir)
+     if (itemId === null || itemId === '') {
+	 console.log('item id is null of empty')
+     }
+     const move_button = document.createElement('button');
+     move_button.textContent = 'move item';
+     let container = document.getElementById('bottom-span');
+     container.appendChild(move_button);
+
+     move_button.addEventListener('click', () => { 
+     	console.log('itemId: ', itemId, 'fromdir: ', fromdir, 'currdir: ', currdir);
+     	let body = {
+     	   'itemId': itemId,
+     	   'from': fromdir,
+     	   'to': currdir,
+     	};
+	const response = window.makeRequest('MoveItem', body)
+	.then(response => {
+	   if (response.status == 25){
+	     Notification(response.msg)
+	     move_button.remove();
+	   } else {
+	     Notification(`something goes wrong: ${response.msg}`); 
+	     move_button.remove();
+	   }
+	})
+	.catch(error => {
+     	   move_button.remove();
+   	   console.log(error);
+	})
      })
   }
 
@@ -184,32 +207,6 @@ function DropZone(){
 	  deleteItemFromFiles(file_item.item_id)
 	});
      }
-//     try{
-//       if (data.status === 25){
-//         Notification("Загрузка завершена")
-//	 setTakenSpace(prevTakenSpace => prevTakenSpace + filesTotalSize);
-//    	 setFiles([])
-//       } else if(data.status === 19){
-//	 Notification(data.msg)
-//	 return
-//       } else if(data.status === 18){
-//	 Notification(data.msg)
-//	 files.forEach(file_item => {
-//	   deleteItemFromFiles(file_item.item_id)
-//	 });
-//       } else if (data.status === 13){
-//         const foundFolder = userFiles.find(item => item.item_id === currdir).name
-//         Notification(`Папка ${foundFolder} не существует`)
-//	 files.forEach(file_item => {
-//	   deleteItemFromFiles(file_item.item_id)
-//	 });
-//       }
-//     } catch(error){
-//	Notification('Ошибка: возможно размер файлов слишком большой')
-//	files.forEach(file_item =>{
-//	  deleteItemFromFiles(file_item.item_id)
-//	});
-//     }
   }
 
 
@@ -349,11 +346,14 @@ function DropZone(){
             <h1 className="message">Получение данных</h1>
 	  )}
 
+	  <span id='bottom-span'>
 	  {currdir !== null && <button id="prev-btn" onClick={() => {
              let foundItem = userFiles.find(item => item.item_id === currdir);
              let prevFolder = foundItem ? foundItem.parent_id[0] : null;
 	     setCurrdir(prevFolder)
-	  }}><svg id="prev-btn-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 16l-6-6 6-6"/><path d="M20 21v-7a4 4 0 0 0-4-4H5"/></svg></button>}
+	  }}><svg id="prev-btn-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 16l-6-6 6-6"/><path d="M20 21v-7a4 4 0 0 0-4-4H5"/></svg></button>
+	   }
+	  </span>
 	</div>
 
         <div className="options">

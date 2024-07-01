@@ -13,6 +13,7 @@ function DropZone(){
   const [notifications, setNotifications] = useState([]);
   const [filesTotalSize, setFilesTotalSize] = useState(0);
   const [takenSpace, setTakenSpace] = useState(0);
+  const [fileManipulation, setFileManipulation] = useState(0);
   const spaceLineRef = useRef(null);
 
 
@@ -109,9 +110,16 @@ function DropZone(){
 
   
   function moveItem(itemId, fromdir){
-     if (itemId === null || itemId === '') {
-	 console.log('item id is null of empty')
+     if (fileManipulation) {
+	Notification('Файл или папка уже используется');
+	return;
      }
+     setFileManipulation(1);
+
+     if (itemId === null || itemId === '') {
+	 console.log('item id should not be null or empty')
+     }
+
      const move_button = document.createElement('button');
      move_button.textContent = 'move item';
      move_button.id = 'move-btn-bottom';
@@ -119,7 +127,6 @@ function DropZone(){
      container.appendChild(move_button);
 
      move_button.addEventListener('click', () => { 
-     	console.log('itemId: ', itemId, 'fromdir: ', fromdir, 'currdir: ', currdir);
      	let body = {
      	   'itemId': itemId,
      	   'from': fromdir,
@@ -130,14 +137,20 @@ function DropZone(){
 	   if (response.status == 25){
 	     Notification(response.msg)
 	     move_button.remove();
+     	     setFileManipulation(0);
+	     setCurrdir(fromdir)
 	   } else {
 	     Notification(`something goes wrong: ${response.msg}`); 
 	     move_button.remove();
+     	     setFileManipulation(0);
+	     setCurrdir(fromdir)
 	   }
 	})
 	.catch(error => {
      	   move_button.remove();
+     	   setFileManipulation(0);
    	   console.log(error);
+	   setCurrdir(fromdir)
 	})
      })
   }

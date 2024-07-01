@@ -114,6 +114,7 @@ function DropZone(){
      }
      const move_button = document.createElement('button');
      move_button.textContent = 'move item';
+     move_button.id = 'move-btn-bottom';
      let container = document.getElementById('bottom-span');
      container.appendChild(move_button);
 
@@ -316,6 +317,7 @@ function DropZone(){
 			</span>
 		        <span className="folder-options">
 		           <button onClick={() => deleteItem(item.item_id, 'folders', item.name)} className="delete-folder">Удалить</button>
+		     	   <button id="move-btn" onClick={() => {moveItem(item.item_id, currdir)}}>move</button>
 			</span>
 		     </div>
 		) : (
@@ -332,7 +334,7 @@ function DropZone(){
 	      	     <button className="download-file" onClick={() => {
 	      	           downloadFiles(item.item_id, item.name)
 	      	     }}>Скачать {formatSizeUnits(item.size)}</button>
-		     <button className="move-file" onClick={() => {moveItem(item.item_id, currdir)}}>move</button>
+		     <button id="move-btn" onClick={() => {moveItem(item.item_id, currdir)}}>move</button>
 		     <button onClick={() => deleteItem(item.item_id, 'files', item.name, item.size)} className="delete-file">Удалить {formatSizeUnits(item.size)}</button>
 		   </span>
 		 </div>

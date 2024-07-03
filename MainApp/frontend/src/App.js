@@ -109,7 +109,7 @@ function DropZone(){
   }
 
   
-  function moveItem(itemId, fromdir){
+  function moveItem(itemId, fromDir){
      if (fileManipulation) {
 	Notification('Файл или папка уже используется');
 	return;
@@ -118,6 +118,7 @@ function DropZone(){
 
      if (itemId === null || itemId === '') {
 	 console.log('item id should not be null or empty')
+	 return
      }
 
      const move_button = document.createElement('button');
@@ -129,31 +130,48 @@ function DropZone(){
      move_button.addEventListener('click', () => { 
      	let body = {
      	   'itemId': itemId,
-     	   'from': fromdir,
      	   'to': currdir,
      	};
 	const response = window.makeRequest('MoveItem', body)
 	.then(response => {
 	   if (response.status == 25){
-	     Notification(response.msg)
+  	     console.log('item id: ', itemId, 'from: ', fromDir, 'to :', body.to);
+	     handleReplaceParentId(itemId, fromDir, body.to);
+	     Notification(response.msg);
 	     move_button.remove();
      	     setFileManipulation(0);
-	     setCurrdir(fromdir)
+	     setCurrdir(body.to);
 	   } else {
 	     Notification(`something goes wrong: ${response.msg}`); 
 	     move_button.remove();
      	     setFileManipulation(0);
-	     setCurrdir(fromdir)
+	     setCurrdir(body.to);
 	   }
 	})
 	.catch(error => {
      	   move_button.remove();
      	   setFileManipulation(0);
    	   console.log(error);
-	   setCurrdir(fromdir)
+	   setCurrdir(body.to);
 	})
      })
   }
+
+
+  const handleReplaceParentId = (itemId, fromDir, to) => {
+    const updatedUserFiles = [...userFiles];
+    const fileIndex = updatedUserFiles.findIndex(item => item.item_id === itemId);
+    if (fileIndex !== -1) {
+      const indexToReplace = updatedUserFiles[fileIndex].parent_id.indexOf(fromDir);
+      console.log(updatedUserFiles[fileIndex].parent_id);
+      if (indexToReplace !== -1) {
+        updatedUserFiles[fileIndex].parent_id.splice(indexToReplace, 1, to);
+        console.log(updatedUserFiles[fileIndex].parent_id);
+        setUserFiles(updatedUserFiles);
+      }
+    }
+  };
+
 
   async function uploadFiles(){
      if (files.length > 0){
@@ -330,7 +348,7 @@ function DropZone(){
 			</span>
 		        <span className="folder-options">
 		           <button onClick={() => deleteItem(item.item_id, 'folders', item.name)} className="delete-folder">Удалить</button>
-		     	   <button id="move-btn" onClick={() => {moveItem(item.item_id, currdir)}}>move</button>
+		     	   <button id="move-btn" onClick={() => {moveItem(item.item_id, String(currdir))}}>move</button>
 			</span>
 		     </div>
 		) : (
@@ -347,7 +365,7 @@ function DropZone(){
 	      	     <button className="download-file" onClick={() => {
 	      	           downloadFiles(item.item_id, item.name)
 	      	     }}>Скачать {formatSizeUnits(item.size)}</button>
-		     <button id="move-btn" onClick={() => {moveItem(item.item_id, currdir)}}>move</button>
+		     <button id="move-btn" onClick={() => {moveItem(item.item_id, String(currdir))}}>move</button>
 		     <button onClick={() => deleteItem(item.item_id, 'files', item.name, item.size)} className="delete-file">Удалить {formatSizeUnits(item.size)}</button>
 		   </span>
 		 </div>

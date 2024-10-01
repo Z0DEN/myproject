@@ -1,3 +1,4 @@
++
 """
 Django settings for myproject project.
 
@@ -118,7 +119,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "django_project",
         "PASSWORD": "djangoisme",
-        "USER": "django_user",
+        "USER": "django_main_user",
         "HOST": "/var/run/postgresql",
         "PORT": "",
     }

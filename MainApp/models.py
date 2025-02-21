@@ -23,4 +23,4 @@ class NodeModel(models.Model):
 
 
 class ServerDataModel(models.Model):
-    personal_key = models.CharField(max_length=64, default="personal_key")
+    personal_key = models.CharField(max_length=64)

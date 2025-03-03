@@ -3,7 +3,7 @@ const csrf_cookie = Cookies.get('csrftoken')
 
 async function updateTokens(){
  console.log('start updating tokens');
- let response = await fetch('https://whoole.space/UserTokenUpdate/', {
+ let response = await fetch('https://whooole.space/UserTokenUpdate/', {
    method: 'POST',
    headers: {
      'Content-Type': 'application/json',
@@ -47,8 +47,8 @@ async function makeRequest(func='GetUserData', body={}, files=[]) {
   };
 
  try {
-	 console.log(`https://${node_domain}.whoole.space:${node_port}/${func}/`)
-   let response = await fetch(`https://${node_domain}.whoole.space:${node_port}/${func}/`, {
+	 console.log(`https://${node_domain}.whooole.space:${node_port}/${func}/`)
+   let response = await fetch(`https://${node_domain}.whooole.space:${node_port}/${func}/`, {
      method: 'POST',
      headers: headers,
      body: bodyData,

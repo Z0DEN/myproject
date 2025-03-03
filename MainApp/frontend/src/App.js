@@ -304,7 +304,7 @@ function DropZone(){
 	        item.type === "folder" ? (
 		     <div key={item.item_id || index} className="folder-item">
 		        <span className="folder-name">
-			   <img width="48" height="48" src="https://whoole.space/static/images/folder-icon.svg" alt="folder-invoices--v1"/>
+			   <img width="48" height="48" src="https://whooole.space/static/images/folder-icon.svg" alt="folder-invoices--v1"/>
 		 	   <button className="explorer-folder" key={index} onClick={() => setCurrdir(item.item_id)}>{item.name}</button>
 			</span>
 		        <span className="folder-options">
@@ -317,7 +317,7 @@ function DropZone(){
    		     <img 
 			width="48" 
 			height="48" 
-			src={`https://whoole.space/static/images/${window.existExt.hasOwnProperty(getFileExtension(item.name)) ? window.existExt[getFileExtension(item.name)] : "undefined-file-icon.svg"}`} 
+			src={`https://whooole.space/static/images/${window.existExt.hasOwnProperty(getFileExtension(item.name)) ? window.existExt[getFileExtension(item.name)] : "undefined-file-icon.svg"}`} 
 			alt="file"/>
 	             <h5 className={`explorer-file ${getFileExtension(item.name)}`}>{item.name}</h5>
 		   </span>
@@ -411,7 +411,7 @@ function DropZone(){
       </>	
   );
 
-// <a href={`https://node2.whoole.space:8002/media/${window.username}/${item.name}`}>open {item.name}</a>
+// <a href={`https://node2.whooole.space:8002/media/${window.username}/${item.name}`}>open {item.name}</a>
 
   function removeAllFiles(){
     setFiles([]);

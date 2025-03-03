@@ -39,7 +39,7 @@ def UpdateNodeTokens(node):
     print('updating tokens')
     new_local_access_token, new_local_refresh_token, new_secret_key = get_token_for_node(node.UUID)
     
-    url = f"https://{node.node_domain}.whoole.space:{node.port}/UpdateNodeTokens/"
+    url = f"https://{node.node_domain}.whooole.space:{node.port}/UpdateNodeTokens/"
 
     headers = {
         'Authorization': 'server Bearer ' + node.node_refresh_token
@@ -84,7 +84,7 @@ def SendData(data):
     node = NodeModel.objects.get(UUID=node_UUID)
     access_token = node.node_access_token
     refresh_token = node.node_refresh_token
-    url = f"https://{node.node_domain}.whoole.space:{node.port}/{func}/"
+    url = f"https://{node.node_domain}.whooole.space:{node.port}/{func}/"
     headers = {
         'Authorization': 'server Bearer ' + access_token
     }

@@ -1,11 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-personal_key = os.environ.get('PERSONAL_KEY')
-entry = ServerDataModel.objects.get(id=1)
-entry.personal_key = personal_key
-entry.save()
-
 class CloudUser(AbstractUser):
     node_domain = models.CharField(max_length=20)
     user_access_token = models.CharField(max_length=256, default="user_access_token")

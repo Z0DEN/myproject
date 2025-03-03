@@ -29,7 +29,7 @@ from .tokens import *
 
 global STATUS_LIST, REDISKA
 
-REDISKA = redis.Redis(host='localhost', port=6379, password='redisisme', db=0)
+REDISKA = redis.Redis(host='localhost', port=6969, password='redisisme', db=0)
 
 # ++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++====++===
 

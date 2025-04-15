@@ -1,1 +1,3 @@
-MainApp/migrations
+__pycache__
+*.pyc
+migrations

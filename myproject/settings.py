@@ -49,7 +49,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-f790b_syh@as9^%j(e290_k8mgsq=7mgznh^g0eu(231#w+j!l"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 #DATA_UPLOAD_MAX_MEMORY_SIZE = 1000000
 
@@ -115,12 +115,16 @@ WSGI_APPLICATION = "myproject.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+#        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": "django_project",
         "PASSWORD": os.environ.get('DBMAINPASSWORD'),
         "USER": "django_main_user",
         "HOST": "/var/run/postgresql",
         "PORT": "",
+#        'OPTIONS': {
+#            'charset': 'utf8',
+#        },
     }
 }
 
@@ -260,3 +264,5 @@ MY_VARIABLES = {
     "existExt": json.dumps(existExt),
     "GREETINGS": "HELLO FRIEND",
 }
+
+LANGUAGE_CODE = 'ru-RU'

@@ -387,7 +387,7 @@ function DropZone(){
      	    type="text"
      	    id="folder-input"
      	    name="folder"
-     	    placeholder="Введите название папки. Enter, чтобы создать"
+     	    placeholder="Новая папка (Enter)"
 	    disabled={!isGetData}
      	    onKeyDown={event => {
      	      if (event.key === 'Enter') {
